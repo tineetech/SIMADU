@@ -11,7 +11,7 @@ export default function LoginPage() {
 	  const password = passwordInput?.value;
   
 	  try {
-		const response = await fetch(`${import.meta.env.VITE_USER_SERVICE}/api/auth/login`, {
+		const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/login`, {
 		  method: 'POST',
 		  headers: {
 			'Content-Type': 'application/json',
@@ -29,7 +29,8 @@ export default function LoginPage() {
 			  icon: "success",
 			}).then((res) => {
 			  if (res.isConfirmed) {
-				if (data.results[0].role === 'admin') {
+				console.log(data)
+				if (data.results.role === 'admin') {
 					console.log('ini admin')
 					window.location.href = '/admin'
 					return

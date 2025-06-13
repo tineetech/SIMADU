@@ -169,6 +169,9 @@ export class LaporController {
         notes,
       } = req.body;
 
+      const userId = req.body.user_id;
+      console.log("USER ID: ", userId)
+
       // Validasi file
       let imageUrl;
       const file = req.file;
@@ -190,7 +193,7 @@ export class LaporController {
 
       // Validasi user_id
       const userExists = await prisma.user.findUnique({
-        where: { user_id: parseInt(user_id) },
+        where: { user_id: parseInt(userId) },
       });
       if (!userExists) {
         return res.status(400).json({ message: "User not found" });
@@ -210,7 +213,7 @@ export class LaporController {
 
       const newLaporan = await prisma.laporan.create({
         data: {
-          user_id: parseInt(user_id),
+          user_id: parseInt(userId),
           image: imageUrl,
           description,
           type_verification: type_verification || "ai",

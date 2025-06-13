@@ -29,7 +29,7 @@ const DataUser = () => {
       }
 
       try {
-        const response = await fetch(`${import.meta.env.VITE_USER_SERVICE}/api/auth/me`, {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/me`, {
           headers: {
             'Authorization': `Bearer ${token}`,
           },
@@ -41,7 +41,7 @@ const DataUser = () => {
           console.log(errorMessage)
         } else {
           const resData = await response.json();
-          setData(resData.results ? resData.results[0] : resData); // Menangani jika 'results' tidak ada
+          setData(resData.results ? resData.results : resData); // Menangani jika 'results' tidak ada
         }
       } catch (e) {
         console.error("Error fetching user data:", e);

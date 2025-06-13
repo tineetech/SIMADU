@@ -9,7 +9,7 @@ export default function ResetPassPage() {
 	  const email = emailInput?.value;
   
 	  try {
-		const response = await fetch(`${import.meta.env.VITE_USER_SERVICE}/api/auth/reset-password`, {
+		const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/reset-password`, {
 		  method: 'POST',
 		  headers: {
 			'Content-Type': 'application/json',

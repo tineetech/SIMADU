@@ -296,14 +296,14 @@ export class AuthController {
       const user = await prisma.user.findUnique({
         where: { user_id: req.user.id },
         include: {
-          koin: true
+          Koin: true
         }
       });
 
       res.status(200).json({ results: user });
     } catch (err) {
       console.error("DB Error:", err);
-      res.status(500).json({ message: "Internal server error" });
+      res.status(500).json({ message: "Internal server error", err });
     }
   }
 }
