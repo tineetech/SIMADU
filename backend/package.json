@@ -1,0 +1,36 @@
+{
+  "name": "simadu_backend",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "npx nodemon src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.9.0",
+    "@supabase/supabase-js": "^2.50.0",
+    "@vercel/blob": "^1.1.1",
+    "axios": "^1.8.4",
+    "bcrypt": "^5.1.1",
+    "cheerio": "^1.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "google-auth-library": "^9.15.1",
+    "handlebars": "^4.7.8",
+    "jsonwebtoken": "^9.0.2",
+    "midtrans-client": "^1.4.3",
+    "multer": "^1.4.5-lts.2",
+    "mysql2": "^3.14.0",
+    "node-html-parser": "^7.0.1",
+    "nodemailer": "^6.10.0",
+    "pg": "^8.16.0"
+  },
+  "devDependencies": {
+    "prisma": "^6.9.0"
+  }
+}

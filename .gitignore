@@ -1,0 +1,28 @@
+# frontend
+/frontend/node_modules
+/frontend/.next
+/frontend/.env
+
+# backend
+/backend/laporan_service/storage
+/backend/post_service/storage
+/backend/node_modules
+/backend/migration/node_modules
+/backend/migration/laporan_service/node_modules
+/backend/migration/notification_service/node_modules
+/backend/migration/postingan_service/node_modules
+/backend/migration/user_service/node_modules
+/backend/artikel_service/node_modules
+/autostart/node_modules
+/backend/user_service/node_modules
+/backend/post_service/node_modules
+/backend/notification_service/node_modules
+/backend/laporan_service/node_modules
+/backend/.env
+/backend/user_service/.env
+/backend/post_service/.env
+/backend/notification_service/.env
+/backend/laporan_service/.env
+
+# common
+.DS_Store

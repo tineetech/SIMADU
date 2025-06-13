@@ -1,0 +1,251 @@
+// schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl  = env("DIRECT_URL")
+}
+
+model User {
+  user_id               Int                    @id @default(autoincrement())
+  username              String                 @unique
+  first_name            String?
+  last_name             String?
+  avatar                String?
+  email                 String                 @unique
+  phone                 BigInt?
+  role                  Role                   @default(guest)
+  password              String
+  password_reset_token  String?
+  google_id             String?
+  verify_email_token    String?
+  status                Boolean                @default(true)
+  created_at            DateTime               @default(now())
+  updated_at            DateTime               @default(now())
+  Koin                  Koin?
+  TransactionKoin       TransactionKoin[]
+  Laporan               Laporan[]
+  Notifikasi            Notifikasi[]
+  Postingan             Postingan[]
+  PostinganLike         PostinganLike[]
+  PostinganReport       PostinganReport[]
+  PostinganComment      PostinganComment[]
+  PostinganCommentReply PostinganCommentReply[]
+  PollingVote           PostinganPollingVote[]
+}
+
+enum Role {
+  guest
+  admin
+}
+
+model Koin {
+  id         Int      @id @default(autoincrement())
+  user_id    Int      @unique
+  User       User     @relation(fields: [user_id], references: [user_id])
+  amount     Int      @default(0)
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+}
+
+model TransactionKoin {
+  id                     Int       @id @default(autoincrement())
+  user_id                Int
+  User                   User      @relation(fields: [user_id], references: [user_id])
+  target                 Int
+  method_target          String
+  method_pay             String?
+  success_convert_amount Int?
+  status                 TrxStatus @default(pending)
+  created_at             DateTime  @default(now())
+  updated_at             DateTime  @default(now())
+}
+
+enum TrxStatus {
+  pending
+  proses
+  success
+}
+
+model Laporan {
+  id                 Int           @id @default(autoincrement())
+  user_id            Int
+  User               User          @relation(fields: [user_id], references: [user_id])
+  image              String
+  location_latitude  String
+  location_longitude String
+  description        String
+  event_date         DateTime
+  category           LaporanCategory @default(lainnya)
+  type_verification  VerificationType @default(ai)
+  status             LaporanStatus @default(pending)
+  notes              String?
+  created_at         DateTime      @default(now())
+  updated_at         DateTime      @default(now())
+  Notifikasi         Notifikasi[]
+}
+
+enum LaporanCategory {
+  jalan_rusak
+  sampah_menumpuk
+  pju_mati
+  banjir
+  lainnya
+}
+
+enum VerificationType {
+  ai
+  automatic
+  manual
+}
+
+enum LaporanStatus {
+  pending
+  proses
+  failed
+  success
+}
+
+model Notifikasi {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  User       User     @relation(fields: [user_id], references: [user_id])
+  laporan_id Int
+  Laporan    Laporan  @relation(fields: [laporan_id], references: [id])
+  title      String
+  message    String
+  is_read    Boolean  @default(false)
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+}
+
+model Postingan {
+  id         Int                    @id @default(autoincrement())
+  user_id    Int
+  User       User                   @relation(fields: [user_id], references: [user_id])
+  type       PostinganType          @default(text)
+  content    String
+  status     PostinganStatus        @default(active)
+  created_at DateTime               @default(now())
+  updated_at DateTime               @default(now())
+  Images     PostinganImage[]
+  Video      PostinganVideo?
+  PollingOptions PostinganPollingOption[]
+  Likes      PostinganLike[]
+  Reports    PostinganReport[]
+  Comments   PostinganComment[]
+}
+
+enum PostinganType {
+  text
+  image
+  video
+  polling
+}
+
+enum PostinganStatus {
+  active
+  draft
+}
+
+model PostinganImage {
+  id         Int       @id @default(autoincrement())
+  post_id    Int
+  Postingan  Postingan @relation(fields: [post_id], references: [id])
+  image      String
+  created_at DateTime  @default(now())
+  updated_at DateTime  @default(now())
+}
+
+model PostinganVideo {
+  id         Int       @id @default(autoincrement())
+  post_id    Int       @unique
+  Postingan  Postingan @relation(fields: [post_id], references: [id])
+  url_video  String
+  created_at DateTime  @default(now())
+  updated_at DateTime  @default(now())
+}
+
+model PostinganPollingOption {
+  id         Int                     @id @default(autoincrement())
+  post_id    Int
+  Postingan  Postingan               @relation(fields: [post_id], references: [id])
+  content    String
+  created_at DateTime                @default(now())
+  Votes      PostinganPollingVote[]
+}
+
+model PostinganPollingVote {
+  id         Int                   @id @default(autoincrement())
+  option_id  Int
+  Option     PostinganPollingOption @relation(fields: [option_id], references: [id])
+  user_id    Int
+  User       User                  @relation(fields: [user_id], references: [user_id])
+  created_at DateTime              @default(now())
+
+  @@unique([option_id, user_id], name: "polling_vote_unique")
+}
+
+model PostinganLike {
+  id         Int       @id @default(autoincrement())
+  post_id    Int
+  Postingan  Postingan @relation(fields: [post_id], references: [id])
+  user_id    Int
+  User       User      @relation(fields: [user_id], references: [user_id])
+  created_at DateTime  @default(now())
+
+  @@unique([post_id, user_id], name: "post_like_unique")
+}
+
+model PostinganReport {
+  id         Int             @id @default(autoincrement())
+  post_id    Int
+  Postingan  Postingan       @relation(fields: [post_id], references: [id])
+  user_id    Int
+  User       User            @relation(fields: [user_id], references: [user_id])
+  reason     String
+  status     ReportStatus    @default(pending)
+  created_at DateTime        @default(now())
+}
+
+enum ReportStatus {
+  pending
+  resolved
+  rejected
+}
+
+model PostinganComment {
+  id         Int                     @id @default(autoincrement())
+  post_id    Int
+  Postingan  Postingan               @relation(fields: [post_id], references: [id])
+  user_id    Int
+  User       User                    @relation(fields: [user_id], references: [user_id])
+  content    String
+  created_at DateTime                @default(now())
+  updated_at DateTime                @default(now())
+  Replies    PostinganCommentReply[]
+
+  @@index([post_id], name: "idx_comment_post")
+  @@index([user_id], name: "idx_comment_user")
+}
+
+model PostinganCommentReply {
+  id             Int                   @id @default(autoincrement())
+  comment_id     Int
+  Comment        PostinganComment      @relation(fields: [comment_id], references: [id])
+  user_id        Int
+  User           User                  @relation(fields: [user_id], references: [user_id])
+  content        String
+  created_at     DateTime              @default(now())
+  updated_at     DateTime              @default(now())
+  parent_reply_id Int?
+  ParentReply    PostinganCommentReply? @relation("ReplyToReply", fields: [parent_reply_id], references: [id])
+  ChildReplies   PostinganCommentReply[] @relation("ReplyToReply")
+
+  @@index([comment_id], name: "idx_reply_comment")
+  @@index([user_id], name: "idx_reply_user")
+}

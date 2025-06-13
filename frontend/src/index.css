@@ -1,0 +1,204 @@
+@import "tailwindcss";
+
+@theme {
+    /* Light Mode */
+    --color-primary: #0057A3;
+    --color-secondary: #65758B;
+    --color-tertiary: #f7f7f7;
+    --color-background: #F9FAFB;
+    --color-accent: #6C94CC;
+    --color-text: #1F2937;
+    --color-textBody: #6B7280;
+
+    /* Dark Mode */
+    --color-primaryDark: #446FAB;
+    --color-secondaryDark: #74849A;
+    --color-tertiaryDark: #111A27;
+    --color-backgroundDark: #060d16;
+    --color-accentDark: #345B93;
+    --color-textDark: #f9fafb;
+    --color-textBodyDark: #b5b5b5;
+}
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Sweet Alert */
+.swal2-popup.dark-swal {
+    background-color: #111A27 !important;
+    color: #f9fafb !important;            
+}
+
+.swal2-title,
+.swal2-content {
+    color: inherit !important;
+}
+
+/* Scrollbar style untuk modern look */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+}
+
+.custom-scrollbar:hover::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.4);
+}
+
+/* Firefox */
+.custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+.custom-scrollbar:hover {
+    scrollbar-color: rgba(255, 255, 255, 0.4) transparent;
+}
+
+/* Background img */
+.banner1 {
+    width: 100%;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 30%, transparent 100%), url('/images/banner1.jpg') center center !important;
+    background-repeat: no-repeat !important;
+    background-size: cover !important;
+    overflow: hidden;
+}
+
+.bg-lapor {
+    background: url('/images/banner1.jpg') center center !important;
+    background-repeat: no-repeat !important;
+    background-size: cover !important;
+}
+
+.bg-coverProfile {
+    background: url('/images/banner2.jpg');
+}
+.loading-box {
+    opacity: 0;
+    animation: loadSkeleton .8s infinite ease-in-out alternate;
+}
+@keyframes loadSkeleton {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: .1;
+    }
+}
+
+.btn-ai {
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
+  animation: bounceDownUp 1s ease infinite alternate;
+}
+.popup-ai {
+  width: 300px;
+  height: 430px;
+}
+.img-greenai {
+  width: 30px;
+  height: 30px;
+}
+.body-chat-greenai {
+  height: 75%;
+  /* background-color: red; */
+  margin-bottom: 10px;
+  overflow-y: auto;
+  /* scrollbar-width: 0;
+  scrollbar-color: #0057A3 transparent; */
+}
+.body-chat-greenai::-webkit-scrollbar {
+  display: none;
+}
+.bubble {
+  width: 100%;
+  padding-inline: 10px;
+  padding-block: 2px;
+  /* margin-bottom: 3px; */
+}
+.bubble-ai {
+  background-color: #ffffff;
+  box-shadow: 0 0 5px rgba(243, 156, 18, 0.1);
+}
+.bubble-user {
+  background-color: #0057A3;
+  color: #ffffff;
+  text-align: right;
+}
+.sender {
+  font-size: 14px;
+  /* font-weight: bo; */
+}
+.sender-ai {
+  color: #0057A3;
+}
+.sender-user {
+  color: #ffffff;
+}
+.mess-greenai {
+  font-size: 12px;
+}
+@keyframes bounceDownUp {
+  0% {
+    transform: translateY(-5px);
+  }
+  100% {
+    transform: translateY(5px);
+  }
+}
+.span-hover-greenai {
+  position: absolute;
+  top: -45px;
+  left: -80px;
+  padding: 5px 10px;
+  transition: all 0.3s ease;
+  opacity: 0;
+  border-radius: 20px 20px 5px 20px;
+}
+.con-btn-ai:hover .span-hover-greenai {
+  opacity: 1 !important;
+}
+
+.loader {
+  width: 30px;
+  aspect-ratio: 2;
+  margin-top: 10px !important;
+  margin-bottom: 16px !important;
+  --_g: no-repeat
+    radial-gradient(circle closest-side, #0057A3 90%, #0000);
+  background: var(--_g) 0% 50%, var(--_g) 50% 50%, var(--_g) 100% 50%;
+  background-size: calc(100% / 3) 50%;
+  animation: l3 1s infinite linear;
+}
+.loader-post {
+  width: 30px;
+  aspect-ratio: 2;
+  margin-top: 10px !important;
+  margin-bottom: 16px !important;
+  --_g: no-repeat
+    radial-gradient(circle closest-side, #FFF 90%, #0000);
+  background: var(--_g) 0% 50%, var(--_g) 50% 50%, var(--_g) 100% 50%;
+  background-size: calc(100% / 3) 50%;
+  animation: l3 1s infinite linear;
+}
+@keyframes l3 {
+  20% {
+    background-position: 0% 0%, 50% 50%, 100% 50%;
+  }
+  40% {
+    background-position: 0% 100%, 50% 0%, 100% 50%;
+  }
+  60% {
+    background-position: 0% 50%, 50% 100%, 100% 0%;
+  }
+  80% {
+    background-position: 0% 50%, 50% 50%, 100% 100%;
+  }
+}
