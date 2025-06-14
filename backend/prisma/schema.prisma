@@ -17,7 +17,7 @@ model User {
   last_name             String?
   avatar                String?
   email                 String                 @unique
-  phone                 BigInt?
+  phone                 String?
   role                  Role                   @default(guest)
   password              String
   password_reset_token  String?

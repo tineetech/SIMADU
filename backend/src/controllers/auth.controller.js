@@ -18,7 +18,7 @@ export class AuthController {
     try {
       // Check if email already exists
       const existingUser = await prisma.user.findUnique({
-        where: { email }
+        where: { email },
       });
 
       if (existingUser) {
@@ -34,23 +34,27 @@ export class AuthController {
             email,
             password: hashedPassword,
             username,
-            avatar: avatar || "https://i.pinimg.com/736x/f1/0f/f7/f10ff70a7155e5ab666bcdd1b45b726d.jpg",
-            role: "guest"
-          }
+            avatar:
+              avatar ||
+              "https://i.pinimg.com/736x/f1/0f/f7/f10ff70a7155e5ab666bcdd1b45b726d.jpg",
+            role: "guest",
+          },
         });
 
         // Create default coins
         await prisma.koin.create({
           data: {
             user_id: user.user_id,
-            amount: 0
-          }
+            amount: 0,
+          },
         });
 
         return user;
       });
 
-      return res.status(201).json({ message: "Register success, please login" });
+      return res
+        .status(201)
+        .json({ message: "Register success, please login" });
     } catch (err) {
       console.error("Database error:", err);
       return res.status(500).json({ message: "Internal server error" });
@@ -62,7 +66,7 @@ export class AuthController {
 
     try {
       const user = await prisma.user.findUnique({
-        where: { email }
+        where: { email },
       });
 
       if (!user) {
@@ -82,7 +86,10 @@ export class AuthController {
       res.status(200).json({
         message: "success login",
         token,
-        results: user,
+        results: {
+          ...user,
+          phone: user.phone?.toString(), // ubah phone ke string jika ada
+        },
       });
     } catch (err) {
       console.error("Database error:", err);
@@ -97,8 +104,8 @@ export class AuthController {
       const user = await prisma.user.findFirst({
         where: {
           email,
-          role: "admin"
-        }
+          role: "admin",
+        },
       });
 
       if (!user) {
@@ -118,7 +125,10 @@ export class AuthController {
       res.status(200).json({
         message: "success login",
         token,
-        results: user,
+        results: {
+          ...user,
+          phone: user.phone?.toString(), // ubah phone ke string jika ada
+        },
       });
     } catch (err) {
       console.error("Database error:", err);
@@ -131,7 +141,7 @@ export class AuthController {
 
     try {
       const user = await prisma.user.findUnique({
-        where: { email }
+        where: { email },
       });
 
       if (!user) {
@@ -146,7 +156,7 @@ export class AuthController {
 
       await prisma.user.update({
         where: { user_id: user.user_id },
-        data: { password_reset_token: token }
+        data: { password_reset_token: token },
       });
 
       await sendResetPassEmail(email, token);
@@ -154,7 +164,8 @@ export class AuthController {
       return res.status(201).json({
         status: "success",
         token: token,
-        message: "Reset Password Link sent successfully. Please check your email for verification.",
+        message:
+          "Reset Password Link sent successfully. Please check your email for verification.",
         user,
       });
     } catch (err) {
@@ -170,7 +181,7 @@ export class AuthController {
       const decodedToken = jwt.verify(token, process.env.SECRET_KEY);
 
       const user = await prisma.user.findUnique({
-        where: { user_id: decodedToken.id }
+        where: { user_id: decodedToken.id },
       });
 
       if (!user) {
@@ -198,7 +209,9 @@ export class AuthController {
 
     try {
       if (!token) {
-        return res.status(401).json({ message: "Unauthorized, where your reset token?" });
+        return res
+          .status(401)
+          .json({ message: "Unauthorized, where your reset token?" });
       }
 
       const decodedToken = jwt.verify(token, process.env.SECRET_KEY);
@@ -214,8 +227,8 @@ export class AuthController {
       const user = await prisma.user.findFirst({
         where: {
           user_id: decodedToken.id,
-          password_reset_token: token
-        }
+          password_reset_token: token,
+        },
       });
 
       if (!user) {
@@ -228,10 +241,10 @@ export class AuthController {
 
       await prisma.user.update({
         where: { user_id: user.user_id },
-        data: { 
-          password: hashedPassword, 
-          password_reset_token: null 
-        }
+        data: {
+          password: hashedPassword,
+          password_reset_token: null,
+        },
       });
 
       return res.status(201).json({
@@ -249,14 +262,18 @@ export class AuthController {
     const { idToken } = req.body;
 
     try {
-      const { email, name, picture, email_verified } = await verifyGoogleToken(idToken);
+      const { email, name, picture, email_verified } = await verifyGoogleToken(
+        idToken
+      );
 
       if (!email_verified) {
-        return res.status(400).json({ message: "Email not verified by Google" });
+        return res
+          .status(400)
+          .json({ message: "Email not verified by Google" });
       }
 
       let user = await prisma.user.findUnique({
-        where: { email }
+        where: { email },
       });
 
       if (!user) {
@@ -266,8 +283,8 @@ export class AuthController {
             email,
             role: "guest",
             username: name,
-            avatar: picture
-          }
+            avatar: picture,
+          },
         });
       }
 
@@ -296,8 +313,8 @@ export class AuthController {
       const user = await prisma.user.findUnique({
         where: { user_id: req.user.id },
         include: {
-          koin: true
-        }
+          Koin: true, 
+        },
       });
 
       res.status(200).json({ results: user });
