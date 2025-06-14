@@ -33,7 +33,7 @@ const GetLaporanData = () => {
       }
 
       try {
-        const response = await fetch(`${import.meta.env.VITE_LAPOR_SERVICE}/api/lapor/`, {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/lapor/`, {
           headers: {
             'Authorization': `Bearer ${token}`,
           },

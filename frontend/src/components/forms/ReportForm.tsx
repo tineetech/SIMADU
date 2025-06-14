@@ -124,7 +124,7 @@ export default function ReportForm() {
                 formData.append('notes', ''); // Atau nilai default lainnya
                 
                 try {
-                const response = await fetch(`${import.meta.env.VITE_LAPOR_SERVICE}/api/lapor/create`, {
+                const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/lapor/create`, {
                     method: "POST",
                     headers: {
                         'Authorization': `Bearer ${token}`
@@ -172,7 +172,7 @@ export default function ReportForm() {
         formData.append('file', uploadFile1);
 
         try {
-            const res = await fetch(`${import.meta.env.VITE_LAPOR_SERVICE}/api/lapor/analisis-ai`, {
+            const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/lapor/analisis-ai`, {
                 method: "POST",
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -207,7 +207,7 @@ export default function ReportForm() {
         formData.append('content', deskripsi);
 
         try {
-            const res = await fetch(`${import.meta.env.VITE_POST_SERVICE}/api/postingan/create`, {
+            const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/postingan/create`, {
                 method: "POST",
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -248,7 +248,7 @@ export default function ReportForm() {
         formData.append('notes', ''); // Atau nilai default lainnya
         
         try {
-        const response = await fetch(`${import.meta.env.VITE_LAPOR_SERVICE}/api/lapor/create`, {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/lapor/create`, {
             method: "POST",
             headers: {
                 'Authorization': `Bearer ${token}`

@@ -26,7 +26,7 @@ export default function CoinVerificationPage() {
     const getPenukaran = async () => {
         try {
             const res = await fetch(
-                `${import.meta.env.VITE_USER_SERVICE}/api/koin/riwayat-penukaran`,
+                `${import.meta.env.VITE_BACKEND_URL}/api/koin/riwayat-penukaran`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -93,7 +93,7 @@ export default function CoinVerificationPage() {
             const orderId = generateTransactionId();
             setCurrentOrderId(orderId); // Simpan order_id ke state
             setCurrentTrxId(id.toString())
-            const res = await fetch(`${import.meta.env.VITE_USER_SERVICE}/api/koin/bayar-penukaran`, {
+            const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/koin/bayar-penukaran`, {
                 method: "POST",
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -137,7 +137,7 @@ export default function CoinVerificationPage() {
 
     const confirmationPayment = async () => {
         try {
-            const res = await fetch(`${import.meta.env.VITE_USER_SERVICE}/api/koin/confirm-penukaran/` + currentOrderId, {
+            const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/koin/confirm-penukaran/` + currentOrderId, {
                 method: "POST",
                 headers: {
                     'Authorization': `Bearer ${token}`,

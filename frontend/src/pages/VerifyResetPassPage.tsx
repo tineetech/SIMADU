@@ -16,7 +16,7 @@ export default function VerifyResetPassPage() {
 		const confirmNewPassword = confirmtNewPassInput?.value;
 
 		try {
-			const response = await fetch(`${import.meta.env.VITE_USER_SERVICE}/api/auth/verify/reset-password`, {
+			const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/verify/reset-password`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',

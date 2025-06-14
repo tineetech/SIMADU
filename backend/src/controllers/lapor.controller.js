@@ -25,15 +25,15 @@ export class LaporController {
       });
     }
 
-    const blob = await put(file.originalname, file.buffer, {
-      access: "public",
-      token: process.env.BLOB_READ_WRITE_TOKEN,
-      contentType: file.mimetype,
-      addRandomSuffix: true,
-    });
-
-    const imagePath = blob.url;
     try {
+      const blob = await put(file.originalname, file.buffer, {
+        access: "public",
+        token: process.env.BLOB_READ_WRITE_TOKEN,
+        contentType: file.mimetype,
+        addRandomSuffix: true,
+      });
+
+      const imagePath = blob.url;
       const response = await axios.get(imagePath, {
         responseType: "arraybuffer",
       });
@@ -56,7 +56,7 @@ export class LaporController {
                 },
               },
               {
-                text: "Apakah gambar tersebut merupakan bencana alam atau kerusakan jalan, sampah menumpuk? Jelaskan temuanmu secara ringkas dan berikan kata awalan YA jika terindikasi dan TIDAK jika tidak terindikasi setelah itu penjelasannya.",
+                text: "Apakah gambar tersebut menunjukkan masalah lingkungan seperti: jalan rusak, sampah menumpuk, PJU mati, banjir, atau bencana alam? Jawab dengan format: [MASALAH/TIDAK] - [Jenis Masalah] - [Deskripsi singkat maksimal 15 kata]",
               },
             ],
           },
@@ -66,20 +66,6 @@ export class LaporController {
       const fetchData = async (apiKey) => {
         const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
         const response = await axios.post(apiUrl, requestBody);
-
-        if (response.status !== 200) {
-          console.error(
-            `Error from Gemini API with key ending in ${apiKey.slice(-5)}:`,
-            response.data
-          );
-          throw {
-            status: response.status,
-            message: `Gagal menghubungi Gemini API dengan key ending in ${apiKey.slice(
-              -5
-            )}`,
-            error: response.data,
-          };
-        }
         return response.data;
       };
 
@@ -91,37 +77,121 @@ export class LaporController {
           responseData = await fetchData(apiKeys[attempts]);
           break;
         } catch (error) {
-          if (error.status === 429 || error.status >= 500) {
-            console.log(
-              `API Key ${attempts + 1} (ending in ${apiKeys[attempts].slice(
-                -5
-              )}) gagal, mencoba API Key ${attempts + 2}...`
-            );
-            attempts++;
-          } else {
-            return res.status(error.status).json({
-              message: "Gagal menghubungi Gemini API.",
-              error: error.error,
-            });
+          attempts++;
+          if (attempts === apiKeys.length) {
+            console.error("Semua API key gagal:", error);
+            throw error;
           }
         }
       }
 
-      if (attempts === apiKeys.length) {
-        const errorMessage = "Semua API Key gagal menghubungi Gemini API.";
-        console.error(errorMessage);
-        return res.status(500).json({
-          message: errorMessage,
-          error: { message: "Semua API Key tidak dapat digunakan." },
-        });
+      const aiResponse =
+        responseData.candidates[0]?.content.parts[0]?.text?.trim() || "";
+
+      let isIssue = false;
+      let issueType = "tidak teridentifikasi";
+      let description = "tidak ada deskripsi";
+
+      const masalahPattern =
+        /^\s*\[(MASALAH|YA|YES)\]\s*-\s*\[(.*?)\]\s*-\s*\[?(.*?)\]?\s*$/i;
+      const tidakPattern = /^\s*\[(TIDAK|NO)\]/i;
+
+      if (masalahPattern.test(aiResponse)) {
+        const matches = aiResponse.match(masalahPattern);
+        isIssue = true;
+        issueType = matches[2]?.trim() || "lainnya";
+        description = matches[3]?.trim() || "masalah teridentifikasi";
+      } else if (tidakPattern.test(aiResponse)) {
+        isIssue = false;
+      } else {
+        isIssue = /jalan rusak|sampah|pju mati|banjir|bencana|kerusakan/i.test(
+          aiResponse
+        );
+        issueType = isIssue ? "lainnya" : "tidak_dikenali";
+        description = aiResponse;
       }
 
-      console.log("Respon dari Gemini API:", responseData);
-      return res.status(200).json({ data: responseData, image: blob.url });
+      if (isIssue) {
+        const userId = req.user.id;
+        const { location_lat, location_long } = req.body;
+
+        if (!location_lat || !location_long) {
+          return res.status(400).json({
+            message: "Koordinat lokasi harus disertakan",
+          });
+        }
+
+        try {
+          const getValidCategory = (aiCategory) => {
+            const categoryMap = {
+              "jalan rusak": "jalan_rusak",
+              "sampah menumpuk": "sampah_menumpuk",
+              "pju mati": "pju_mati",
+              "banjir": "banjir",
+              "bencana alam": "bencana_alam",
+            };
+
+            const lowerCaseCategory = aiCategory.toLowerCase();
+            return categoryMap[lowerCaseCategory] || "lainnya";
+          };
+
+          const category = getValidCategory(issueType);
+
+          const newReport = await prisma.laporan.create({
+            data: {
+              user_id: parseInt(userId),
+              image: blob.url,
+              description: description,
+              type_verification: "ai",
+              status: "success",
+              verified_by_ai: true,
+              location_latitude: location_lat,
+              location_longitude: location_long,
+              event_date: new Date(),
+              category: category,
+            },
+          });
+
+          return res.status(201).json({
+            success: true,
+            message: "Laporan masalah lingkungan berhasil diverifikasi AI",
+            data: {
+              report: newReport,
+              ai_analysis: {
+                is_issue: true,
+                issue_type: issueType,
+                description: description,
+                original_response: aiResponse,
+              },
+            },
+          });
+        } catch (dbError) {
+          console.error("Database error:", dbError);
+          return res.status(500).json({
+            success: false,
+            message: "Gagal menyimpan laporan",
+            error: dbError.message,
+          });
+        }
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: "Analisis selesai",
+        data: {
+          ai_analysis: {
+            is_issue: false,
+            original_response: aiResponse,
+            interpreted_response:
+              "Bukan masalah lingkungan berdasarkan analisis AI",
+          },
+        },
+      });
     } catch (error) {
       console.error("Error:", error);
       return res.status(500).json({
-        message: "Terjadi kesalahan internal.",
+        success: false,
+        message: "Terjadi kesalahan dalam proses analisis AI",
         error: error.message,
       });
     }
@@ -148,7 +218,8 @@ export class LaporController {
     } catch (error) {
       console.error("Database error:", error);
       res.status(500).json({
-        error: error instanceof Error ? error.message : "Unknown error occurred",
+        error:
+          error instanceof Error ? error.message : "Unknown error occurred",
       });
     }
   }
@@ -156,7 +227,6 @@ export class LaporController {
   async createLapor(req, res) {
     try {
       const {
-        user_id,
         location_lat,
         location_long,
         event_date,
@@ -169,7 +239,9 @@ export class LaporController {
         notes,
       } = req.body;
 
-      // Validasi file
+      const userId = req.user.id;
+      console.log(req.user);
+
       let imageUrl;
       const file = req.file;
       if (!file && !isVerifyWithAi) {
@@ -188,9 +260,8 @@ export class LaporController {
         });
       }
 
-      // Validasi user_id
       const userExists = await prisma.user.findUnique({
-        where: { user_id: parseInt(user_id) },
+        where: { user_id: parseInt(userId) },
       });
       if (!userExists) {
         return res.status(400).json({ message: "User not found" });
@@ -210,7 +281,7 @@ export class LaporController {
 
       const newLaporan = await prisma.laporan.create({
         data: {
-          user_id: parseInt(user_id),
+          user_id: parseInt(userId),
           image: imageUrl,
           description,
           type_verification: type_verification || "ai",
@@ -231,7 +302,8 @@ export class LaporController {
     } catch (error) {
       console.error("Error:", error);
       res.status(500).json({
-        error: error instanceof Error ? error.message : "Unknown error occurred",
+        error:
+          error instanceof Error ? error.message : "Unknown error occurred",
       });
     }
   }
@@ -241,7 +313,6 @@ export class LaporController {
       const { status } = req.body;
       const { id } = req.params;
 
-      // Cek laporan
       const laporan = await prisma.laporan.findUnique({
         where: { id: parseInt(id) },
       });
@@ -257,7 +328,6 @@ export class LaporController {
         });
       }
 
-      // Update status
       const updatedLaporan = await prisma.laporan.update({
         where: { id: parseInt(id) },
         data: { status },
@@ -270,7 +340,8 @@ export class LaporController {
     } catch (error) {
       console.error("Error:", error);
       res.status(500).json({
-        error: error instanceof Error ? error.message : "Unknown error occurred",
+        error:
+          error instanceof Error ? error.message : "Unknown error occurred",
       });
     }
   }
@@ -294,7 +365,8 @@ export class LaporController {
       }
       console.error("Error:", error);
       res.status(500).json({
-        error: error instanceof Error ? error.message : "Unknown error occurred",
+        error:
+          error instanceof Error ? error.message : "Unknown error occurred",
       });
     }
   }

@@ -18,7 +18,7 @@ export default function CommunityPage() {
         setLoading(true);
         try {
             const response = await fetch(
-                `${import.meta.env.VITE_POST_SERVICE}/api/postingan/?page=${page}&limit=10}`
+                `${import.meta.env.VITE_BACKEND_URL}/api/postingan/?page=${page}&limit=10}`
             );
             const data = await response.json();
             if (data?.data) {

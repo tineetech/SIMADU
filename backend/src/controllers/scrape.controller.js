@@ -75,7 +75,7 @@ const getArticleDetails = async (url) => {
       sourceUrl: url,
     };
   } catch (error) {
-    console.error(`Error scraping article from ${url}:`, error);
+    // console.error(`Error scraping article from ${url}:`, error);
     return null;
   }
 };
@@ -132,7 +132,7 @@ export const getArticlePopuler = async (req, res) => {
       source: "Kompas Terpopuler",
     });
   } catch (error) {
-    console.error("Error scraping popular news:", error);
+    // console.error("Error scraping popular news:", error);
     res.status(500).json({
       success: false,
       error: "Failed to scrape popular news",
@@ -207,7 +207,7 @@ export const scrapeDataWithDetails = async (req, res) => {
       scrapedAt: new Date().toISOString(),
     });
   } catch (error) {
-    console.error("Scraping error:", error);
+    // console.error("Scraping error:", error);
     res.status(500).json({
       error: "Error scraping Kompas headlines with details",
       details: error.message,

@@ -36,13 +36,11 @@ export class PostRouter {
       upload.single("media"), // <- handle file dari frontend (field name: media)
       async (req, res) => {
         try {
-          // Upload dulu ke Vercel Blob kalau ada file
           if (req.file) {
             const mediaUrl = await uploadFile(req.file);
             req.body.media_url = mediaUrl;
           }
 
-          // Teruskan ke controller createPost
           await PostController.createPost(req, res);
         } catch (err) {
           res.status(500).json({ message: err.message });

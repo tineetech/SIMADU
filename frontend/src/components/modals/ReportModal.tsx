@@ -26,7 +26,7 @@ export default function ReportModal({ report, onClose }: ReportModalProps) {
     const isDark = document.documentElement.classList.contains("dark");
     const updateStatus = async (id: number) => {
         try {
-            const response = await fetch(`${import.meta.env.VITE_LAPOR_SERVICE}/api/lapor/update-status/${id}`, {
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/lapor/update-status/${id}`, {
                 method: "POST",
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('authToken') ?? ''}`,
@@ -76,7 +76,7 @@ export default function ReportModal({ report, onClose }: ReportModalProps) {
 
     const sendCoin = async (user_id: number) => {
         try {
-            const response = await fetch(`${import.meta.env.VITE_USER_SERVICE}/api/users/koin/update/${user_id}`, {
+            const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/users/koin/update/${user_id}`, {
                 method: "POST",
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('authToken') ?? ''}`,
@@ -173,7 +173,7 @@ export default function ReportModal({ report, onClose }: ReportModalProps) {
 
     const handleManualStatusUpdate = async (newStatus: string) => {
         if (!report) return;
-        const res = await fetch(`${import.meta.env.VITE_LAPOR_SERVICE}/api/lapor/update-status/${report.id}`, {
+        const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/lapor/update-status/${report.id}`, {
             method: "POST",
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('authToken') ?? ''}`,
@@ -235,7 +235,7 @@ export default function ReportModal({ report, onClose }: ReportModalProps) {
                     >
                         <div className="flex flex-col gap-4">
                             <img
-                                src={import.meta.env.VITE_LAPOR_SERVICE + report.image}
+                                src={import.meta.env.VITE_BACKEND_URL + report.image}
                                 alt={report.title}
                                 className="rounded-lg w-full max-h-56 object-cover"
                             />

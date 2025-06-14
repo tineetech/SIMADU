@@ -75,39 +75,41 @@ model Laporan {
   id                 Int           @id @default(autoincrement())
   user_id            Int
   User               User          @relation(fields: [user_id], references: [user_id])
-  image              String
-  location_latitude  String
-  location_longitude String
-  description        String
-  event_date         DateTime
-  category           LaporanCategory @default(lainnya)
-  type_verification  VerificationType @default(ai)
-  status             LaporanStatus @default(pending)
-  notes              String?
-  created_at         DateTime      @default(now())
-  updated_at         DateTime      @default(now())
-  Notifikasi         Notifikasi[]
+  image              String        // URL gambar laporan
+  location_latitude  String        // Koordinat latitude
+  location_longitude String        // Koordinat longitude
+  description        String        // Deskripsi masalah
+  event_date         DateTime      // Tanggal kejadian
+  category           LaporanCategory @default(lainnya) // Kategori masalah
+  type_verification  VerificationType @default(ai) // Metode verifikasi
+  verified_by_ai     Boolean       @default(false) // Status verifikasi AI
+  status             LaporanStatus @default(pending) // Status laporan
+  notes              String?       // Catatan tambahan (opsional)
+  created_at         DateTime      @default(now()) // Waktu pembuatan
+  updated_at         DateTime      @default(now()) // Waktu terakhir update
+  Notifikasi         Notifikasi[]  // Notifikasi terkait
 }
 
 enum LaporanCategory {
-  jalan_rusak
-  sampah_menumpuk
-  pju_mati
-  banjir
-  lainnya
+  jalan_rusak       // Jalan rusak atau berlubang
+  sampah_menumpuk   // Sampah menumpuk tidak terangkut
+  pju_mati          // Penerangan jalan umum mati
+  banjir            // Genangan atau banjir
+  bencana_alam      // Bencana alam seperti gempa, longsor
+  lainnya           // Masalah lingkungan lainnya
 }
 
 enum VerificationType {
-  ai
-  automatic
-  manual
+  ai         // Verifikasi oleh AI
+  automatic  // Verifikasi otomatis (sistem)
+  manual     // Verifikasi manual oleh admin
 }
 
 enum LaporanStatus {
-  pending
-  proses
-  failed
-  success
+  pending  // Menunggu verifikasi
+  proses   // Sedang diproses
+  failed   // Gagal diverifikasi
+  success  // Berhasil diverifikasi
 }
 
 model Notifikasi {

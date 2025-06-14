@@ -33,7 +33,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/berita", new ScrapeRouter().getRouter());
 app.use("/api/users", new UsersRouter().getRouter());
 app.use("/api/postingan", new PostRouter().getRouter());
-app.use("/api/notif", new NotifRouter().getRouter());
+app.use("/api/notification", new NotifRouter().getRouter());
 app.use("/api/lapor", new LaporRouter().getRouter());
 app.use("/api/koin", new KoinRouter().getRouter());
 app.use("/api/auth", new AuthRouter().getRouter());

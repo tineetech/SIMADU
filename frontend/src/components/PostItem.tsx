@@ -17,7 +17,7 @@ export default function PostItem({ post }: { post: PostInterface }) {
 
   const handleLike = async (postId: number) => {
     try {
-      const res = await fetch(`${import.meta.env.VITE_POST_SERVICE}/api/postingan/${postId}/like`, {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/postingan/${postId}/like`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -118,7 +118,7 @@ export default function PostItem({ post }: { post: PostInterface }) {
     urlEncodedData.append("content", content);
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_POST_SERVICE}/api/postingan/${id}/comments`, {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/postingan/${id}/comments`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -171,7 +171,7 @@ export default function PostItem({ post }: { post: PostInterface }) {
     urlEncodedData.append("content", content);
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_POST_SERVICE}/api/postingan/comments/${commentId}/replies`, {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/postingan/comments/${commentId}/replies`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -216,7 +216,7 @@ export default function PostItem({ post }: { post: PostInterface }) {
     urlEncodedData.append("reason", "Ujaran kebencian");
 
     try {
-      const res = await fetch(`${import.meta.env.VITE_POST_SERVICE}/api/postingan/${postId}/report`, {
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/postingan/${postId}/report`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

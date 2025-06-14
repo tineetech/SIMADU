@@ -17,7 +17,7 @@ export default function Comment({ comment, postingan, handleReply }: CommentProp
 
     const deleteKomen = async (id: number) => {
         try {
-            const res = await fetch(`${import.meta.env.VITE_POST_SERVICE}/api/postingan/comments/${id}`, {
+            const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/postingan/comments/${id}`, {
                 method: "DELETE",
                 headers: {
                     Authorization: `Bearer ${token}`,

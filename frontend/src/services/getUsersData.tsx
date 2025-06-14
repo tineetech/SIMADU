@@ -31,7 +31,7 @@ const GetUsersData = () => {
       }
 
       try {
-        const response = await fetch(`${import.meta.env.VITE_USER_SERVICE}/api/users/`, {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/users/`, {
           headers: {
             'Authorization': `Bearer ${token}`,
           },

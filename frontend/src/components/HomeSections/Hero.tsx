@@ -12,7 +12,7 @@ export default function Hero() {
     useEffect(() => {
         const fetchBerita = async () => {
             try {
-                const response = await axios.get('http://localhost:5005/api/berita/');
+                const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/berita/scrape`);
                 setBerita(response.data);
                 console.log(response)
                 setLoading(false);

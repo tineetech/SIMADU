@@ -82,7 +82,7 @@ export default function CoinExchangeForm() {
             }
 
 
-            const res = await fetch(`${import.meta.env.VITE_USER_SERVICE}/api/users/koin/request-penukaran`, {
+            const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/users/koin/request-penukaran`, {
                 method: "POST",
                 headers: {
                     'Authorization': `Bearer ${token}`,

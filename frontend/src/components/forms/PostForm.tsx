@@ -64,7 +64,7 @@ export default function PostForm() {
                 formData.append('media', selectedImage ?? null);
                 formData.append('type', 'image');
 
-                const res = await fetch(`${import.meta.env.VITE_POST_SERVICE}/api/postingan/create`, {
+                const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/postingan/create`, {
                     method: "POST",
                     headers: {
                         'Authorization': `Bearer ${token}`
@@ -95,7 +95,7 @@ export default function PostForm() {
                 return
             }
 
-            const res = await fetch(`${import.meta.env.VITE_POST_SERVICE}/api/postingan/create`, {
+            const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/postingan/create`, {
                 method: "POST",
                 headers: {
                     'Authorization': `Bearer ${token}`

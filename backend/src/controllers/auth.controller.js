@@ -7,7 +7,7 @@ import {
 } from "../services/mailer.js";
 import { hashPass } from "../helpers/hashpassword.js";
 import verifyGoogleToken from "../services/Oauth.js";
-import { prisma } from "../services/db.js"; // Changed from supabase to prisma
+import { prisma } from "../services/db.js";
 
 const JWT_SECRET = process.env.SECRET_KEY || "osdjfksdhfishd";
 
@@ -16,7 +16,6 @@ export class AuthController {
     const { email, password, username, avatar } = req.body;
 
     try {
-      // Check if email already exists
       const existingUser = await prisma.user.findUnique({
         where: { email },
       });
@@ -27,7 +26,6 @@ export class AuthController {
 
       const hashedPassword = await hashPass(password);
 
-      // Create new user with Prisma transaction to ensure both user and koin are created
       const newUser = await prisma.$transaction(async (prisma) => {
         const user = await prisma.user.create({
           data: {
@@ -41,7 +39,6 @@ export class AuthController {
           },
         });
 
-        // Create default coins
         await prisma.koin.create({
           data: {
             user_id: user.user_id,
@@ -88,7 +85,7 @@ export class AuthController {
         token,
         results: {
           ...user,
-          phone: user.phone?.toString(), // ubah phone ke string jika ada
+          phone: user.phone?.toString(),
         },
       });
     } catch (err) {
@@ -127,7 +124,7 @@ export class AuthController {
         token,
         results: {
           ...user,
-          phone: user.phone?.toString(), // ubah phone ke string jika ada
+          phone: user.phone?.toString(),
         },
       });
     } catch (err) {
@@ -320,7 +317,7 @@ export class AuthController {
       res.status(200).json({ results: user });
     } catch (err) {
       console.error("DB Error:", err);
-      res.status(500).json({ message: "Internal server error" });
+      res.status(500).json({ message: "Internal server error", err });
     }
   }
 }

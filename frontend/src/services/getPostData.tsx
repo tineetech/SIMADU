@@ -26,7 +26,7 @@ const GetPostData = () => {
       }
 
       try {
-        const response = await fetch(`${import.meta.env.VITE_POST_SERVICE}/api/postingan/`, {
+        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/postingan/`, {
           headers: {
             'Authorization': `Bearer ${token}`,
           },

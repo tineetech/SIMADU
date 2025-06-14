@@ -6,7 +6,7 @@ const checkIsLogin = async (): Promise<boolean> => {
   }
 
   try {
-    const response = await fetch(`${import.meta.env.VITE_USER_SERVICE}/api/auth/me`, {
+    const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/me`, {
       headers: {
         'Authorization': `Bearer ${token}`,
       },

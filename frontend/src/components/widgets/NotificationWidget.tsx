@@ -15,7 +15,7 @@ export default function NotificationWidget() {
 
     const getAllNotif = async () => {
         try {
-            const res = await fetch(`${import.meta.env.VITE_NOTIF_SERVICE}/api/notification`, {
+            const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/notification`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                 },
