@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Outlet } from "react-router-dom";
-import SidebarMobile from "../components/navigations/SidebarMobile";
+import SidebarMobile from "../components/Navigations/SidebarMobile";
 import DashboardHeader from "../components/DashboardHeader";
-import Sidebar from "../components/navigations/Sidebar";
+import Sidebar from "../components/Navigations/Sidebar";
 
 export default function AdminLayout() {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
