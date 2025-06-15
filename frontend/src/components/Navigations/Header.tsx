@@ -14,7 +14,7 @@ export default function Header() {
     const [scrolled, setScrolled] = useState(false);
     const location = useLocation();
     const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const datas = DataUser()
+    const { data, loading } = DataUser();
     const navLinks = [
         { name: "Home", path: "/", icon: <Home size={20} /> },
         { name: "Komunitas", path: "/komunitas", icon: <Users size={20} /> },
@@ -86,7 +86,7 @@ export default function Header() {
                     </div>
                     {
                         isLoggedIn ? (
-                            <div className="flex gap-6 items-center">
+                            <div className="hidden sm:flex gap-6 items-center">
                                 <NotificationWidget />
                                 <ProfileWidget />
                             </div>
@@ -120,18 +120,42 @@ export default function Header() {
                                 {/* Profile Section */}
                                 {isLoggedIn && (
                                     <div className="flex items-center justify-between w-full">
-                                        <div className="flex items-center space-x-3 w-full">
-                                            <img
-                                                src="/images/profile.jpg"
-                                                alt="Profile"
-                                                className="w-16 h-16 rounded-full object-cover"
-                                            />
-                                            <div>
-                                                <p className="text-lg font-semibold">Username</p>
-                                                <p className="text-sm text-textBody dark:text-textBodyDark">john@example.com</p>
-                                            </div>
-                                        </div>
-                                        <NotificationWidget />
+                                        {(() => {
+                                            if (loading) {
+                                                return (
+                                                    <div className="flex items-center space-x-3 w-full animate-pulse">
+                                                        <div className="w-16 h-16 bg-gray-300 rounded-full" />
+                                                        <div className="space-y-2">
+                                                            <div className="w-32 h-5 bg-gray-300 rounded" />
+                                                            <div className="w-48 h-4 bg-gray-200 rounded" />
+                                                        </div>
+                                                    </div>
+                                                );
+                                            }
+
+                                            if (!data) return null;
+
+                                            return (
+                                                <>
+                                                    <div className="flex items-center space-x-3 w-full">
+                                                        <img
+                                                            src={data.avatar || "/images/profile.jpg"}
+                                                            alt="Profile"
+                                                            className="w-16 h-16 rounded-full object-cover"
+                                                        />
+                                                        <div>
+                                                            <p className="text-lg font-semibold">
+                                                                {data.username || `${data.first_name ?? ""} ${data.last_name ?? ""}`}
+                                                            </p>
+                                                            <p className="text-sm text-textBody dark:text-textBodyDark">
+                                                                {data.email}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                    <NotificationWidget />
+                                                </>
+                                            );
+                                        })()}
                                     </div>
                                 )}
 

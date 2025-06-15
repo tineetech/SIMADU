@@ -2,7 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { CompanyInfo } from './CompanyInfo'
 import { BotMessageSquare, Send, X } from 'lucide-react';
-import RequestToSikuyAi from './RequestToSikuyi';
+import RequestToSimaduAI from './RequestToSikuyi';
 
 interface ChatMessage {
   hideInChat?: boolean;
@@ -24,7 +24,7 @@ interface ButtonAiProps {
 
 const LoaderAi = (
   <div className="bubble bubble-ai rounded-md">
-    <span className="sender sender-ai">SikuyAi</span>
+    <span className="sender sender-ai">Simadu AI</span>
     <div className="mess-greenai">
       <div className="loader"></div>
     </div>
@@ -32,7 +32,7 @@ const LoaderAi = (
 );
 
 const PopupAi: React.FC<PopupAiProps> = ({ aiActive, setAiActive }) => {
-  const { requestAi } = RequestToSikuyAi();
+  const { requestAi } = RequestToSimaduAI();
   const [disButton, setDisButton] = useState<boolean>(false);
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([
     {
@@ -106,7 +106,7 @@ const PopupAi: React.FC<PopupAiProps> = ({ aiActive, setAiActive }) => {
     >
       <div className="w-full py-2 border-bottom items-center flex justify-between">
         <div className="flex gap-2 items-center">
-          <span className="text-primary dark:text-textDark font-bold">SikuyAi</span>
+          <span className="text-primary dark:text-textDark font-bold">Simadu AI</span>
         </div>
         <button 
           className="btn btn-close text-black dark:text-white" 
@@ -135,7 +135,7 @@ const PopupAi: React.FC<PopupAiProps> = ({ aiActive, setAiActive }) => {
                   <span
                     className={`sender sender-${chat.role === "model" ? "ai" : "user"}`}
                   >
-                    {chat.role === "model" ? "SikuyAi" : "User"}
+                    {chat.role === "model" ? "SimaduAI" : "User"}
                   </span>
                   <p className="mess-greenai">{chat.text}</p>
                 </div>
@@ -145,7 +145,7 @@ const PopupAi: React.FC<PopupAiProps> = ({ aiActive, setAiActive }) => {
         ) : (
           <div className="w-full h-full flex justify-center items-center">
             <span className="text-satoshi text-muted border-bottom text-black dark:text-white">
-              Let's Talk With SikuyAi!
+              Tanyakan apa saja ke Simadu AI
             </span>
           </div>
         )}
@@ -155,7 +155,7 @@ const PopupAi: React.FC<PopupAiProps> = ({ aiActive, setAiActive }) => {
           <input
             type="text"
             ref={inputRef}
-            placeholder="Tanya Dengan SikuyAi.."
+            placeholder="Tanya Dengan SimaduAI.."
             required
             className="w-full bg-gray-200 dark:bg-gray-600 text-black dark:text-white p-2 rounded-md"
           />
@@ -204,7 +204,7 @@ const ButtonAi: React.FC<ButtonAiProps> = ({ aiActive, setAiActive }) => {
         className='bg-primary span-hover-greenai text-white' 
         style={{ opacity: firstSpan ? "1" : "0" }}
       >
-        <span>SikuyAi</span>
+        <span>Simadu AI</span>
       </div>
       <div 
         className='rounded-md btn-ai flex items-center justify-center text-white shadow-sm bg-primary dark:bg-primaryDark' 
@@ -216,7 +216,7 @@ const ButtonAi: React.FC<ButtonAiProps> = ({ aiActive, setAiActive }) => {
   );
 };
 
-const SikuyAi: React.FC = () => {
+const SimaduAI: React.FC = () => {
   const [aiActive, setAiActive] = useState<boolean>(false);
   
   return (
@@ -227,4 +227,4 @@ const SikuyAi: React.FC = () => {
   );
 };
 
-export default SikuyAi;
+export default SimaduAI;

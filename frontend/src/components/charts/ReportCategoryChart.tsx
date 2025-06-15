@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useContext } from "react";
+import { useContext, useMemo } from "react";
 import { Doughnut } from 'react-chartjs-2';
 import {
     Chart as ChartJS,
@@ -11,8 +11,9 @@ import {
     ChartData
 } from 'chart.js';
 import { DarkModeContext } from "../../contexts/DarkModeContext";
+import { Report } from "../../types";
 
-// Daftarkan plugin hanya sekali (di luar komponen)
+// Registrasi chart plugin
 ChartJS.register(ArcElement, Tooltip, Legend, Filler);
 
 const createCenterTextPlugin = (isDark: boolean) => ({
@@ -43,16 +44,42 @@ const createCenterTextPlugin = (isDark: boolean) => ({
     },
 });
 
-export default function ReportCategoryChart() {
+type Props = {
+    laporan: Report[];
+};
+
+export default function ReportCategoryChart({ laporan }: Props) {
     const { darkMode } = useContext(DarkModeContext) ?? { darkMode: false };
 
+    const { labels, dataPoints, colors } = useMemo(() => {
+        const countByCategory: Record<string, number> = {};
+
+        laporan.forEach((item) => {
+            const category = item.category || "Lainnya";
+            countByCategory[category] = (countByCategory[category] ?? 0) + 1;
+        });
+
+        const categoryColors: Record<string, string> = {
+            "jalan_rusak": "#8fff67",
+            "sampah_menumpuk": "#67fffC",
+            "bencana_alam": "#C767FF",
+            "Lainnya": "#FF6769",
+        };
+
+        const labels = Object.keys(countByCategory);
+        const dataPoints = Object.values(countByCategory);
+        const colors = labels.map((label) => categoryColors[label] ?? "#ccc");
+
+        return { labels, dataPoints, colors };
+    }, [laporan]);
+
     const data: ChartData<'doughnut', number[], string> = {
-        labels: ['Jalan Rusak', 'Sampah', 'Bencana Alam', 'Lainnya'],
+        labels,
         datasets: [
             {
-                label: 'Jumlah Laporan',
-                data: [46, 37, 28, 12],
-                backgroundColor: ['#8fff67', '#67fffC', '#C767FF', '#FF6769'],
+                label: "Jumlah Laporan",
+                data: dataPoints,
+                backgroundColor: colors,
                 borderWidth: 0,
             },
         ],
@@ -60,14 +87,14 @@ export default function ReportCategoryChart() {
 
     const options: ChartOptions<'doughnut'> = {
         responsive: true,
-        cutout: '75%',
+        cutout: "75%",
         plugins: {
             legend: {
                 display: false,
             },
             tooltip: {
-                bodyColor: '#fff',
-                titleColor: '#fff',
+                bodyColor: "#fff",
+                titleColor: "#fff",
             },
         },
     };
@@ -76,7 +103,7 @@ export default function ReportCategoryChart() {
 
     return (
         <Doughnut
-            key={darkMode ? 'dark' : 'light'} // 👉 trigger re-render saat tema berubah
+            key={darkMode ? "dark" : "light"}
             data={data}
             options={options}
             plugins={plugins}

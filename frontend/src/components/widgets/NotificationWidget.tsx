@@ -3,49 +3,22 @@ import { useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { Bell } from "lucide-react";
 import { isThisWeek, parseISO } from "date-fns";
-import DataUser from "../../services/dataUser";
+import { getAllNotifications, Notification } from "../../services/getNotificationData";
 
 export default function NotificationWidget() {
-    const [notifications, setNotifications] = useState([]);
+    const [notifications, setNotifications] = useState<Notification[]>([]);
     const [showNotif, setShowNotif] = useState(false);
     const notifRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
-    const datas = DataUser()
-    const token = localStorage.getItem('authToken') ?? '';
 
-    const getAllNotif = async () => {
-        try {
-            const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/notification`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                },
-            })
+    useEffect(() => {
+        const fetchData = async () => {
+            const data = await getAllNotifications();
+            setNotifications(data);
+        };
+        fetchData();
+    }, []);
 
-            if (!res.ok) {
-                console.log("gagal get notif: ", res)
-                return 
-            }
-
-            const data = await res.json()
-            console.log(data)
-            if (data?.data && Array.isArray(data.data) && data.data.length > 0) {
-                const mappedNotifications = data.data.filter((item) => item.user_id === datas.data?.user_id).map((item: any) => ({
-                    id: item.id,
-                    title: item.title,
-                    detail: item.message,
-                    date: item.created_at.split('T')[0], // Ambil hanya bagian tanggal
-                    checked: !!item.is_read, // Konversi is_read menjadi boolean
-                    // Anda bisa menambahkan mapping field lain jika dibutuhkan
-                }));
-                setNotifications(mappedNotifications);
-            } else {
-                console.log("Tidak ada data notifikasi yang valid dari API.");
-                setNotifications([]); // Set state ke array kosong jika tidak ada data
-            }
-        } catch (e) {
-            console.error(e)
-        }
-    }
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
             if (notifRef.current && !notifRef.current.contains(event.target as Node)) {
@@ -57,29 +30,21 @@ export default function NotificationWidget() {
         return () => {
             document.removeEventListener("mousedown", handleClickOutside);
         };
-
     }, []);
 
-    useEffect(() => {
-        getAllNotif()
-    }, [])
-
-    // Filter notifikasi minggu ini
     const thisWeekNotifications = notifications.filter((notif) =>
         isThisWeek(parseISO(notif.date), { weekStartsOn: 1 })
     );
 
-    // Cek apakah ada yang belum dibaca
     const hasUnread = thisWeekNotifications.some((notif) => !notif.checked);
 
     const handleNotifClick = (id: number) => {
-        // Tandai sebagai telah dicek (hanya lokal/simulasi)
-        const updated = notifications.map((notif) =>
-            notif.id === id ? { ...notif, checked: true } : notif
+        setNotifications((prev) =>
+            prev.map((notif) =>
+                notif.id === id ? { ...notif, checked: true } : notif
+            )
         );
-        setNotifications(updated);
 
-        // Navigasi ke halaman notifikasi
         navigate("/profile");
     };
 
@@ -105,16 +70,19 @@ export default function NotificationWidget() {
                     >
                         <h2 className="text-text dark:text-textDark font-semibold mb-3">Notifikasi</h2>
                         <ul className="space-y-2 text-sm text-text dark:text-textDark">
-                            {notifications.length > 0 ? (
-                                notifications.map((notif) => (
+                            {thisWeekNotifications.length > 0 ? (
+                                thisWeekNotifications.map((notif) => (
                                     <li
                                         key={notif.id}
-                                        className="rounded-lg p-3 cursor-pointer hover:shadow-md transition bg-gray-50 dark:bg-gray-800"
+                                        className={`rounded-lg p-3 cursor-pointer hover:shadow-md transition ${notif.checked
+                                                ? "bg-gray-100 dark:bg-gray-700"
+                                                : "bg-gray-50 dark:bg-gray-800"
+                                            }`}
                                         onClick={() => handleNotifClick(notif.id)}
                                     >
                                         <div className="font-medium">{notif.title}</div>
                                         <div className="text-xs text-gray-500 dark:text-gray-400">
-                                            {notif.detail}
+                                            {notif.description}
                                         </div>
                                     </li>
                                 ))

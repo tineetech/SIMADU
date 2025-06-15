@@ -2,91 +2,56 @@ import { useState } from "react";
 import { Coins, FileText, GalleryHorizontal, Plus, Repeat } from "lucide-react";
 import PostItem from "../components/PostItem";
 import ReportList from "../components/ReportList";
-import { PostInterface, Report } from "../types";
 import NotificationsHistory from "../components/NotificationsHistory";
 import { Link } from "react-router-dom";
 import DataUser from "../services/dataUser";
+import GetPostData from "../services/getPostData";
+import GetLaporanData from "../services/getLaporanData";
 
 export default function ProfilePage() {
     const datas = DataUser();
+    const { data: allPosts = [], loading: loadingPosts } = GetPostData();
+    const { data: allReports = [], loading: loadingReports } = GetLaporanData();
     const [activeTab, setActiveTab] = useState("report");
     const tabs = [
         { key: "report", label: "Laporan" },
         { key: "post", label: "Postingan" },
     ];
 
-    const dummyUser = {
+    if (datas.loading || loadingPosts || loadingReports) {
+        return <div className="text-center py-10">Memuat data...</div>;
+    }
+
+    const user = {
+        id: datas?.data?.user_id ?? 0,
         firstName: datas?.data?.first_name ?? '',
         lastName: datas?.data?.last_name ?? '',
         username: datas?.data?.username ?? '',
-        joinedAt: datas.data?.created_at ?? '',
+        joinedAt: datas?.data?.created_at ?? '',
         coin: datas?.data?.amount ?? 0,
-        avatar: datas.data?.avatar ?? '',
-        email: datas.data?.email
+        avatar: datas?.data?.avatar ?? '',
+        email: datas?.data?.email
     };
 
-    const isoDate = dummyUser.joinedAt;
+    console.log("DATA USER", datas)
+
+    const userPosts = Array.isArray(allPosts?.data)
+        ? allPosts.data.filter((post) => post.user_id === user.id)
+        : [];
+
+    const userReports = Array.isArray(allReports?.data)
+        ? allReports.data.filter((report) => report.user_id === user.id)
+        : [];
+
+
+    console.log("USER", user)
+    console.log("USER POST", userPosts)
+    console.log("USER REPORT", userReports)
+
+    const isoDate = user.joinedAt;
     const date = new Date(isoDate);
     const options = { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' };
     const formattedDate = date.toLocaleDateString('id-ID', options);
-
-    const dummyReports: Report[] = [
-        {
-            id: 1,
-            title: "Sampah menumpuk di Taman Sempur",
-            description: "Terdapat tumpukan sampah yang tidak diangkut lebih dari 3 hari.",
-            image: "/images/sample-report.jpg",
-            status: "Diproses",
-            submittedAt: "2025-04-22",
-        },
-        {
-            id: 2,
-            title: "Jalan rusak di Jl. Pajajaran",
-            description: "Lubang besar berbahaya untuk pengendara motor, perlu perbaikan.",
-            image: "/images/sample-report2.jpg",
-            status: "Tertunda",
-            submittedAt: "2025-04-18",
-        },
-    ];
-
-    const dummyPosts: PostInterface[] = [
-        {
-            id: 1,
-            user_id: 101,
-            username: "farhan.mp4",
-            avatar: "/images/profile.jpg",
-            image: "",
-            content: "Hari ini saya melihat langsung proses pembersihan saluran air di Suryakencana. Salut untuk petugas!",
-            type: "text",
-            users: {
-                user_id: 101,
-                username: "farhan.mp4"
-            },
-            created_at: "1 jam lalu",
-            likes: 18,
-            comment_count: 4,
-            like_count: 18,
-            comments: {}
-        },
-        {
-            id: 2,
-            user_id: 101,
-            username: "farhan.mp4",
-            avatar: "/images/profile.jpg",
-            image: "",
-            content: "Apakah ada yang tahu siapa yang bisa dihubungi untuk perbaikan lampu jalan di daerah Bubulak?",
-            type: "text",
-            users: {
-                user_id: 101,
-                username: "farhan.mp4"
-            },
-            created_at: "3 hari lalu",
-            likes: 42,
-            comment_count: 9,
-            like_count: 42,
-            comments: {}
-        }
-    ];
 
     return (
         <div className="bg-background dark:bg-backgroundDark text-text dark:text-textDark">
@@ -99,13 +64,13 @@ export default function ProfilePage() {
                 <aside className="col-span-12 md:col-span-4 lg:col-span-3 -mt-24 relative z-10 order-1 md:order-none">
                     <div className="bg-tertiary dark:bg-tertiaryDark rounded-md shadow p-6 md:p-8">
                         <img
-                            src={dummyUser.avatar}
+                            src={user.avatar}
                             alt="Profile"
                             className="w-36 h-36 rounded-full object-cover mx-auto"
                         />
                         <div className="flex flex-col items-center mt-4">
-                            <h1 className="text-xl font-semibold">{dummyUser.firstName} {dummyUser.lastName}</h1>
-                            <h2 className="text-textBody dark:text-textBodyDark">@{dummyUser.username}</h2>
+                            <h1 className="text-xl font-semibold">{user.firstName} {user.lastName}</h1>
+                            <h2 className="text-textBody dark:text-textBodyDark">@{user.username}</h2>
                         </div>
 
                         <div className="mt-6 space-y-4">
@@ -115,7 +80,7 @@ export default function ProfilePage() {
                                     <Coins className="text-yellow-500" />
                                     <div>
                                         <p className="text-sm text-textBody dark:text-textBodyDark">Coin</p>
-                                        <p className="text-xl font-medium">{dummyUser.coin}</p>
+                                        <p className="text-xl font-medium">{user.coin}</p>
                                     </div>
                                 </div>
                                 <Link
@@ -133,7 +98,7 @@ export default function ProfilePage() {
                                     <FileText className="text-blue-500" />
                                     <div>
                                         <p className="text-sm text-textBody dark:text-textBodyDark">Total Laporan</p>
-                                        <p className="text-xl font-medium">{dummyReports.length}</p>
+                                        <p className="text-xl font-medium">{userReports.length}</p>
                                     </div>
                                 </div>
                                 <Link
@@ -151,7 +116,7 @@ export default function ProfilePage() {
                                     <GalleryHorizontal className="text-green-500" />
                                     <div>
                                         <p className="text-sm text-textBody dark:text-textBodyDark">Total Postingan</p>
-                                        <p className="text-xl font-medium">{dummyPosts.length}</p>
+                                        <p className="text-xl font-medium">{userPosts.length}</p>
                                     </div>
                                 </div>
                                 <Link
@@ -166,7 +131,7 @@ export default function ProfilePage() {
 
                         <div className="mt-6 space-y-2 text-sm text-textBody dark:text-textBodyDark text-center">
                             <p>Bergabung pada {formattedDate}</p>
-                            <p>{dummyUser.email}</p>
+                            <p>{user.email}</p>
                         </div>
                     </div>
                 </aside>
@@ -192,18 +157,30 @@ export default function ProfilePage() {
                     {/* Content and Notification */}
                     <div className="grid grid-cols-1 lg:grid-cols-9 gap-6">
                         <main className="col-span-1 lg:col-span-6 space-y-4">
-                            {activeTab === "report"
-                                ? dummyReports.map((report, index) => (
-                                    <ReportList
-                                        key={report.id}
-                                        report={report}
-                                        index={index}
-                                        hideDetailButton={true}
-                                    />
-                                ))
-                                : dummyPosts.map((post) => (
+                            {activeTab === "report" ? (
+                                userReports.length > 0 ? (
+                                    userReports.map((report, index) => (
+                                        <ReportList
+                                            key={report.id}
+                                            report={report}
+                                            index={index}
+                                            hideDetailButton={true}
+                                        />
+                                    ))
+                                ) : (
+                                    <div className="text-center text-sm text-textBody dark:text-textBodyDark mt-8">
+                                        Belum ada laporan yang dikirim.
+                                    </div>
+                                )
+                            ) : userPosts.length > 0 ? (
+                                userPosts.map((post) => (
                                     <PostItem key={post.id} post={post} />
-                                ))}
+                                ))
+                            ) : (
+                                <div className="text-center text-sm text-textBody dark:text-textBodyDark mt-8">
+                                    Belum ada postingan yang dibuat.
+                                </div>
+                            )}
                         </main>
 
                         <div className="col-span-1 lg:col-span-3">

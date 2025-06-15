@@ -17,8 +17,8 @@ export default function Sidebar() {
             transition={{ duration: 0.6, ease: "easeOut" }}
             className="bg-tertiaryDark ml-4 my-4 shadow-xl w-20 flex flex-col items-center py-6 space-y-8 rounded-[20px]"
         >
-            <div className="w-12 h-12 rounded-full bg-background flex items-center justify-center text-text font-bold text-xl">
-                A
+            <div className="p-2 rounded-full bg-background flex items-center justify-center text-text font-bold text-xl">
+                <img src="/images/logo.png" className="w-6 h-6 object-contain" alt="" />
             </div>
             <div className="flex flex-col gap-8 text-textDark">
                 {sidebarItems.map((item, index) => {
