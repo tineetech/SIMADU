@@ -23,7 +23,7 @@ export default function Footer() {
               <li><a href="/komunitas" className="hover:bg-primary hover:text-white rounded-full py-1 px-2.5 transition-all ease-in-out">Komunitas</a></li>
             </ul>
             <ul className="space-y-4 text-sm">
-              <li><a href="/artikel" className="hover:bg-primary hover:text-white rounded-full py-1 px-2.5 transition-all ease-in-out">Artikel</a></li>
+              {/* <li><a href="/artikel" className="hover:bg-primary hover:text-white rounded-full py-1 px-2.5 transition-all ease-in-out">Artikel</a></li> */}
               <li><a href="/login" className="hover:bg-primary hover:text-white rounded-full py-1 px-2.5 transition-all ease-in-out">Login</a></li>
               <li><a href="/register" className="hover:bg-primary hover:text-white rounded-full py-1 px-2.5 transition-all ease-in-out">Register</a></li>
             </ul>

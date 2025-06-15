@@ -202,3 +202,43 @@
     background-position: 0% 50%, 50% 50%, 100% 100%;
   }
 }
+.animation-splash1 {
+  animation: splash1 4s ease-in-out 1s;
+}
+.animation-splash2 {
+    animation: splash2 1s ease-in-out 4s;
+}
+.animation-splash3 {
+    opacity: 0;
+    animation: splash3 1.3s ease-in-out 1s;
+}
+
+  @keyframes splash1 {
+    0% {
+        height: 0;
+    }
+    50% {
+        height: 100%;
+    }
+    100% {
+        height: 0;
+    }
+  }
+  @keyframes splash2 {
+    0% {
+        opacity: 1;
+        display: flex;
+    }
+    100% {
+        opacity: 0;
+        display: none;
+    }
+  }
+  @keyframes splash3 {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+  }

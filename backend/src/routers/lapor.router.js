@@ -26,7 +26,7 @@ export class LaporRouter {
     this.router.get(
       "/",
       this.laporController.getLapor,
-      this.authMiddleware.verifyToken
+      // this.authMiddleware.verifyToken
     );
     
     this.router.post(
