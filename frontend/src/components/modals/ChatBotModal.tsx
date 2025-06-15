@@ -78,7 +78,7 @@ export default function ChatBotModal({ onClose }: ChatBotModalProps) {
                     <div className="flex justify-between items-center border-b border-textBody dark:border-textBodyDark py-4">
                         <div className="flex items-center gap-2">
                             <Bot size={32} />
-                            <h2 className="font-semibold text-xl">Ucup AI</h2>
+                            <h2 className="font-semibold text-xl">SIMADU AI</h2>
                         </div>
                         <button
                             onClick={onClose}

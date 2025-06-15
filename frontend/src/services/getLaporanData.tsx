@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 export interface Laporan {
     data: {
+        forEach(arg0: (item: any) => void): unknown;
         map: any;
         length?: number;
         user_id?: number;

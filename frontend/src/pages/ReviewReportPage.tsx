@@ -17,90 +17,57 @@ import ReportModal from "../components/modals/ReportModal";
 import StatusReportChart from "../components/charts/StatusReportChart";
 import ReportProgressList from "../components/ReportProgressList";
 import OptionFilter from "../components/widgets/OptionFilterProps";
+import GetLaporanData from "../services/GetLaporanData";
 
 export default function ReviewReportPage() {
-    const dummyReports: Report[] = [
-        {
-            title: "Laporan Kehilangan Barang",
-            description: "Barang hilang di ruang kelas B203 saat jam istirahat.",
-            submittedAt: "2025-04-24",
-            image: "/images/about.jpg",
-            status: "Tertunda",
-            category: "Lainnya",
-        },
-        {
-            title: "Kerusakan Fasilitas",
-            description: "Kursi patah di ruang kelas A102.",
-            submittedAt: "2025-04-22",
-            image: "/images/about.jpg",
-            status: "Selesai",
-            category: "Lainnya",
-        },
-        {
-            title: "Kebisingan Berlebihan",
-            description: "Terdapat kebisingan dari ruang praktik musik selama jam pelajaran.",
-            submittedAt: "2025-04-20",
-            image: "/images/about.jpg",
-            status: "Tertunda",
-            category: "Lainnya",
-        },
-        {
-            title: "Laporan Penemuan Barang",
-            description: "Ditemukan dompet hitam di taman belakang kampus.",
-            submittedAt: "2025-04-19",
-            image: "/images/about.jpg",
-            status: "Tertunda",
-            category: "Lainnya",
-        },
-        {
-            title: "Kebocoran Atap",
-            description: "Atap bocor di lorong lantai 3.",
-            submittedAt: "2025-04-18",
-            image: "/images/about.jpg",
-            status: "Diproses",
-            category: "Lainnya",
-        },
-        {
-            title: "Pencemaran Suara",
-            description: "Bunyi mesin genset mengganggu saat belajar.",
-            submittedAt: "2025-04-17",
-            image: "/images/about.jpg",
-            status: "Diterima",
-            category: "Sampah",
-        },
-        {
-            title: "Lampu Jalan Mati",
-            description: "Lampu jalan depan gerbang kampus tidak menyala.",
-            submittedAt: "2025-04-16",
-            image: "/images/about.jpg",
-            status: "Diproses",
-            category: "PJU mati",
-        },
-        {
-            title: "Pohon Tumbang",
-            description: "Pohon tumbang di dekat parkiran motor.",
-            submittedAt: "2025-04-15",
-            image: "/images/about.jpg",
-            status: "Diproses",
-            category: "Jalan Rusak",
-        },
-        {
-            title: "Banjir di Lorong",
-            description: "Air meluap di lorong bawah gedung C saat hujan.",
-            submittedAt: "2025-04-14",
-            image: "/images/about.jpg",
-            status: "Diproses",
-            category: "Banjir",
-        },
-        {
-            title: "Jalan Rusak",
-            description: "Aspal rusak di belakang gedung olahraga.",
-            submittedAt: "2025-04-13",
-            image: "/images/about.jpg",
-            status: "Tertunda",
-            category: "Jalan Rusak",
-        },
-    ];
+    const { data: laporanRaw, loading } = GetLaporanData();
+
+    const laporanArray = Array.isArray(laporanRaw?.data) ? laporanRaw.data : [];
+
+    const Reports: Report[] = laporanArray.map((lapor: any) => ({
+        title: lapor.title || "Tanpa Judul",
+        description: lapor.description || lapor.notes || "Tidak ada deskripsi",
+        submittedAt: lapor.event_date || "2025-01-01",
+        image: lapor.image || "/images/about.jpg",
+        status: lapor.status || "Pending",
+        category: lapor.category || "Lainnya",
+    }));
+
+    // Fungsi bantu untuk dapatkan nama bulan dari ISO string
+    const getMonthName = (dateStr: string) => {
+        const date = new Date(dateStr);
+        return date.toLocaleString("id-ID", { month: "long", year: "numeric" }); // contoh: "Juni 2025"
+    };
+
+    // Kelompokkan laporan berdasarkan bulan dan status
+    const getMonthlyStatusData = (reports: Report[]) => {
+        const monthlyMap: Record<string, { pending: number; proses: number; success: number }> = {};
+
+        reports.forEach((report) => {
+            const month = getMonthName(report.submittedAt); // pakai submittedAt dari Report
+
+            if (!monthlyMap[month]) {
+                monthlyMap[month] = { pending: 0, proses: 0, success: 0 };
+            }
+
+            if (report.status === "pending") monthlyMap[month].pending += 1;
+            else if (report.status === "proses") monthlyMap[month].proses += 1;
+            else if (report.status === "success") monthlyMap[month].success += 1;
+        });
+
+        // Konversi ke array
+        const result = Object.entries(monthlyMap).map(([bulan, value]) => ({
+            bulan,
+            ...value,
+        }));
+
+        // Urutkan berdasarkan waktu bulan
+        result.sort((a, b) => new Date("1 " + a.bulan).getTime() - new Date("1 " + b.bulan).getTime());
+
+        return result;
+    };
+
+    const monthlyStatusData = getMonthlyStatusData(Reports);
 
     const categoryIcons: { [key: string]: JSX.Element } = {
         "Jalan Rusak": <TrafficCone />,
@@ -120,9 +87,9 @@ export default function ReviewReportPage() {
     const [currentPage, setCurrentPage] = useState(1);
     const reportsPerPage = 5;
 
-    const pendingReports = dummyReports.filter(report => report.status === "Tertunda");
+    const pendingReports = Reports.filter(report => report.status === "Tertunda");
 
-    const filteredReports = dummyReports
+    const filteredReports = Reports
         .filter(report => report.status !== "Tertunda")
         .filter((report) => {
             const matchSearch = report.title.toLowerCase().includes(searchTerm.toLowerCase());
@@ -143,6 +110,11 @@ export default function ReviewReportPage() {
             reportListRef.current?.scrollIntoView({ behavior: "smooth" });
         }, 100);
     };
+
+    if (loading) {
+        return <p className="text-center py-10">Memuat laporan...</p>;
+    }
+
 
     return (
         <>
@@ -232,7 +204,7 @@ export default function ReviewReportPage() {
                     <div className="mb-6">
                         <h1 className="text-xl font-semibold mb-4">Proses Laporan</h1>
                         <div className="flex flex-col gap-4">
-                            {dummyReports
+                            {Reports
                                 .filter((report) => report.status === "Diproses")
                                 .slice(0, 3)
                                 .map((report, idx) => {
@@ -247,7 +219,7 @@ export default function ReviewReportPage() {
                                         />
                                     );
                                 })}
-                            {dummyReports.filter((r) => r.status === "Diproses").length > 3 && (
+                            {Reports.filter((r) => r.status === "Diproses").length > 3 && (
                                 <div className="flex justify-end">
                                     <p
                                         className="text-sm font-light cursor-pointer hover:underline"
@@ -264,7 +236,7 @@ export default function ReviewReportPage() {
                     <div className="flex flex-col">
                         <h1 className="text-xl font-semibold mb-4">Statistik Laporan</h1>
                         <div className="bg-tertiary dark:bg-tertiaryDark rounded-md shadow-md w-full p-4 overflow-x-auto">
-                            <StatusReportChart />
+                            <StatusReportChart dataStatus={monthlyStatusData} />
                         </div>
                     </div>
                 </div>
