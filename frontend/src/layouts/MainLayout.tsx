@@ -1,5 +1,5 @@
-import Header from "../components/navigations/Header";
-import Footer from "../components/navigations/Footer";
+import Header from "../components/Navigations/Header";
+import Footer from "../components/Navigations/Footer";
 import { Outlet } from "react-router-dom";
 import SimaduAI from "../components/SimaduAI";
 
