@@ -1,5 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { format } from 'date-fns';
+import { id } from 'date-fns/locale';
 import { ClipboardPenLine, Megaphone, Users } from 'lucide-react';
 import { Report, ReportedPost } from "../types";
 import MonthlyReportChart from "../components/charts/MonthlyReportChart";
@@ -13,6 +15,7 @@ import DataUser from "../services/dataUser";
 import GetLaporanData from "../services/getLaporanData";
 import GetPostData from "../services/getPostData";
 import GetUsersData from "../services/getUsersData";
+import GetReportedPosts from "../services/getReportedPost";
 
 export default function Dashboard() {
     const [selectedReport, setSelectedReport] = useState<Report | null>(null);
@@ -20,6 +23,29 @@ export default function Dashboard() {
     const dataLapor = GetLaporanData()
     const dataPost = GetPostData()
     const dataUsers = GetUsersData()
+
+    const monthlyData = useMemo(() => {
+        if (!dataLapor?.data?.data) return { labels: [], dataPoints: [] };
+
+        // Inisialisasi array 12 bulan
+        const countsPerMonth = Array(12).fill(0);
+
+        dataLapor.data.data.forEach((item: any) => {
+            const date = new Date(item.created_at);
+            const month = date.getMonth(); // 0 (Jan) sampai 11 (Des)
+            countsPerMonth[month]++;
+        });
+
+        // Label bulan dalam Bahasa Indonesia
+        const monthLabels = Array.from({ length: 12 }, (_, index) =>
+            format(new Date(2025, index, 1), "MMM", { locale: id })
+        );
+
+        return {
+            labels: monthLabels,
+            dataPoints: countsPerMonth,
+        };
+    }, [dataLapor]);
 
     const cards = [
         {
@@ -40,10 +66,11 @@ export default function Dashboard() {
             bgColor: "bg-blue-200",
             icon: <Users size={16} />,
             title: "Total User",
-            value: dataUsers?.data?.data?.length ?? '0',
+            value: dataUsers?.data?.data?.length ?? '8',
             link: "/profile"
         },
     ];
+
 
     const [recentUnverified, setRecentUnverified] = useState<Report[]>([]);
 
@@ -68,34 +95,23 @@ export default function Dashboard() {
         }
     }, [dataLapor]);
 
-    const reportedPosts: ReportedPost[] = [
-        {
-            reportedBy: 'RizkyPratama',
-            date: '2025-04-28',
-            content: 'Isi postingan mengandung ujaran kebencian terhadap kelompok tertentu.',
-            reason: 'Ujaran kebencian',
-            image: 'https://source.unsplash.com/random/400x300?hate'
-        },
-        {
-            reportedBy: 'DewiAnggraini',
-            date: '2025-04-25',
-            content: 'Postingan ini menawarkan pekerjaan dengan gaji tinggi tetapi meminta uang pendaftaran.',
-            reason: 'Penipuan',
-            image: 'https://source.unsplash.com/random/400x300?fraud'
-        },
-        {
-            reportedBy: 'YusufHalim',
-            date: '2025-04-24',
-            content: 'Judul clickbait dan isi tidak sesuai dengan fakta atau sumber resmi.',
-            reason: 'Informasi menyesatkan',
-        },
-        {
-            reportedBy: 'YusufHalim',
-            date: '2025-04-24',
-            content: 'Judul clickbait dan isi tidak sesuai dengan fakta atau sumber resmi.',
-            reason: 'Informasi menyesatkan',
-        }
-    ];
+    const [reportedPosts, setReportedPosts] = useState<ReportedPost[]>([]);
+    const [isLoadingReportedPosts, setIsLoadingReportedPosts] = useState(true);
+
+    useEffect(() => {
+        const fetchReportedPosts = async () => {
+            try {
+                const posts = await GetReportedPosts();
+                setReportedPosts(posts);
+            } catch (error) {
+                console.error("Gagal memuat data reported posts:", error);
+            } finally {
+                setIsLoadingReportedPosts(false);
+            }
+        };
+
+        fetchReportedPosts();
+    }, []);
 
     const datas = DataUser()
 
@@ -127,7 +143,10 @@ export default function Dashboard() {
                     {/* Monthly Chart */}
                     <div className="flex flex-col bg-tertiary dark:bg-tertiaryDark p-6 md:p-8 rounded-md shadow-md">
                         <h1 className="text-lg font-semibold mb-6 md:mb-8">Laporan Bulanan</h1>
-                        <MonthlyReportChart />
+                        <MonthlyReportChart
+                            labels={monthlyData.labels}
+                            dataPoints={monthlyData.dataPoints}
+                        />
                     </div>
 
                     {/* Report Card Section */}
@@ -138,16 +157,22 @@ export default function Dashboard() {
                                 Lihat Semua
                             </Link>
                         </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 px-4 md:px-8">
-                            {recentUnverified.slice(0, 3).map((report, index) => (
-                                <ReportCard
-                                    key={index}
-                                    index={index}
-                                    item={report}
-                                    onViewDetail={setSelectedReport}
-                                    colSpan=""
-                                />
-                            ))}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 px-4 md:px-0">
+                            {recentUnverified.length === 0 ? (
+                                <p className="text-sm text-center text-textBody dark:text-textBodyDark col-span-3">
+                                    Belum ada laporan terbaru.
+                                </p>
+                            ) : (
+                                recentUnverified.slice(0, 3).map((report, index) => (
+                                    <ReportCard
+                                        key={index}
+                                        index={index}
+                                        item={report}
+                                        onViewDetail={setSelectedReport}
+                                        colSpan=""
+                                    />
+                                ))
+                            )}
                         </div>
                     </div>
                 </div>
@@ -172,18 +197,30 @@ export default function Dashboard() {
                     {/* Category Chart */}
                     <div className="flex flex-col px-6">
                         <h1 className="text-lg font-semibold mb-4">Kategori Laporan</h1>
-                        <ReportCategoryChart />
+                        <ReportCategoryChart laporan={dataLapor?.data?.data ?? []} />
                     </div>
 
                     {/* Reported Posts */}
                     <div className="flex flex-col gap-4 p-6 pb-8">
                         <div className="flex justify-between items-center">
                             <h1 className="text-lg font-semibold">Postingan yang Dilaporkan</h1>
-                            <p className="text-sm text-textBody dark:text-textBodyDark">{reportedPosts.length} Post</p>
+                            <p className="text-sm text-textBody dark:text-textBodyDark">
+                                {reportedPosts.length} Post
+                            </p>
                         </div>
-                        {reportedPosts.slice(0, 3).map((post, index) => (
-                            <ReportedPostCard key={index} post={post} onClick={() => setSelectedPost(post)} />
-                        ))}
+                        {isLoadingReportedPosts ? (
+                            <p className="text-sm text-textBody dark:text-textBodyDark">Memuat data...</p>
+                        ) : reportedPosts.length === 0 ? (
+                            <p className="text-sm text-textBody dark:text-textBodyDark">Belum ada postingan yang dilaporkan.</p>
+                        ) : (
+                            reportedPosts.slice(0, 3).map((post, index) => (
+                                <ReportedPostCard
+                                    key={index}
+                                    post={post}
+                                    onClick={() => setSelectedPost(post)}
+                                />
+                            ))
+                        )}
                     </div>
                 </div>
             </div>

@@ -44,13 +44,13 @@ export interface Report {
     submittedAt: string;
     description: string;
     image: string;
-    status: "Tertunda" | "Diterima" | "Diproses" | "Selesai"
+    status: "pending" | "proses" | "success" | "failed"
 };
 
 export interface ReportedPost {
-    image?: string;
     reportedBy: string;
     date: string;
     content: string;
     reason: string;
+    image?: string;
 }

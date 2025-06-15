@@ -22,19 +22,24 @@ ChartJS.register(
     Legend
 );
 
-export default function MonthlyReportChart() {
+type MonthlyReportChartProps = {
+    labels: string[];       // contoh: ['Jan', 'Feb', ...]
+    dataPoints: number[];   // contoh: [30, 45, 50, ...]
+};
+
+export default function MonthlyReportChart({ labels, dataPoints }: MonthlyReportChartProps) {
     const { darkMode } = useContext(DarkModeContext) ?? { darkMode: false };
 
     const textColor = darkMode ? '#E5E7EB' : '#4B5563';
-    const bgColor = darkMode ? '#1F2937' : '#F9FAFB'; 
+    const bgColor = darkMode ? '#1F2937' : '#F9FAFB';
     const tooltipTitle = darkMode ? '#F9FAFB' : '#111827';
 
     const data = {
-        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun'],
+        labels,
         datasets: [
             {
                 label: 'Jumlah Laporan',
-                data: [30, 45, 50, 40, 60, 75],
+                data: dataPoints,
                 borderColor: '#04d9ff',
                 pointBackgroundColor: '#04d9ff',
                 pointBorderColor: '#04d9ff',

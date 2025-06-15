@@ -12,40 +12,51 @@ import { DarkModeContext } from "../../contexts/DarkModeContext";
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
-export default function StatusReportChart() {
+type MonthlyStatusReport = {
+    bulan: string;
+    pending: number;
+    proses: number;
+    success: number;
+};
+
+type Props = {
+    dataStatus: MonthlyStatusReport[];
+};
+
+export default function StatusReportChart({ dataStatus }: Props) {
     const { darkMode } = useContext(DarkModeContext) ?? { darkMode: false };
 
+    const labels = dataStatus.map(item => item.bulan);
+
     const data = {
-        labels: ['Januari', 'Februari', 'Maret', 'April'],
+        labels,
         datasets: [
             {
-                label: 'Ditunda',
-                data: [12, 18, 9, 7],
-                backgroundColor: '#8fff67',
+                label: 'Pending',
+                data: dataStatus.map(item => item.pending),
+                backgroundColor: '#facc15', // kuning soft
             },
             {
-                label: 'Diterima',
-                data: [20, 14, 16, 22],
-                backgroundColor: '#67fffC',
+                label: 'Proses',
+                data: dataStatus.map(item => item.proses),
+                backgroundColor: '#60a5fa', // biru soft
             },
             {
-                label: 'Diproses',
-                data: [15, 10, 12, 9],
-                backgroundColor: '#C767FF',
-            },
-            {
-                label: 'Selesai',
-                data: [8, 12, 14, 18],
-                backgroundColor: '#FF6769',
+                label: 'Success',
+                data: dataStatus.map(item => item.success),
+                backgroundColor: '#34d399', // hijau soft
             },
         ],
     };
 
     const options = {
         responsive: true,
+        indexAxis: 'y', // membuat bar horizontal
         plugins: {
             legend: {
-                display: false,
+                labels: {
+                    color: darkMode ? '#fff' : '#000',
+                },
             },
             tooltip: {
                 bodyColor: '#fff',
@@ -53,7 +64,7 @@ export default function StatusReportChart() {
             },
         },
         scales: {
-            y: {
+            x: {
                 beginAtZero: true,
                 ticks: {
                     color: darkMode ? '#ffffff' : '#000000',
@@ -62,7 +73,7 @@ export default function StatusReportChart() {
                     color: darkMode ? '#444' : '#ccc',
                 },
             },
-            x: {
+            y: {
                 ticks: {
                     color: darkMode ? '#ffffff' : '#000000',
                 },
@@ -72,6 +83,7 @@ export default function StatusReportChart() {
             },
         },
     };
+
 
     return (
         <Bar
