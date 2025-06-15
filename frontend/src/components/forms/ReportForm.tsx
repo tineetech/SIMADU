@@ -29,6 +29,7 @@ export default function ReportForm() {
     const [estimasiWaktu, setEstimasiWaktu] = useState<string>('');
     const [deskripsi, setDeskripsi] = useState<string>('');
     const [isClickVerifAi, setIsClickVerifAi] = useState<boolean>(false);
+    const [isSubmit, setIsSubmit] = useState<boolean>(false);
     const [progress, setProgress] = useState<number>(0);
     const [message, setMessage] = useState<string>('Memulai Analisis...');
     const dataUser = DataUser()
@@ -105,54 +106,23 @@ export default function ReportForm() {
                 console.log("gagal analisis tidak ada hasil :", resAi)
             }
             
-            if (resAi?.res?.includes('YA')) {
+            if (resAi?.res?.includes('berhasil')) {
+                
+                createPostWhenFinishReport()
+                
                 setProgress(100)
                 setMessage('Analisa berhasil, gambar tersebut terverifikasi sebagai laporan bencana alam atau kerusakan.')
                 
-                const formData = new FormData();
-                formData.append('user_id', dataUser?.data?.user_id?.toString() ?? '');
-                formData.append('file', uploadFile1);
-                formData.append('location_lat', clickedLatLng.lat?.toString() ?? '');
-                formData.append('location_long', clickedLatLng.lng?.toString() ?? '');
-                formData.append('event_date', estimasiWaktu ?? '');
-                formData.append('category', jenisMasalah);
-                formData.append('description', deskripsi);
-                formData.append('isVerifyWithAi', 'true');
-                formData.append('urlImage', resAi?.image ?? '');
-                formData.append('type_verification', 'manual'); // Atau sesuai kebutuhan
-                formData.append('status', 'pending'); // Atau status default lainnya
-                formData.append('notes', ''); // Atau nilai default lainnya
-                
-                try {
-                const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/lapor/create`, {
-                    method: "POST",
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: formData, // Gunakan formData sebagai body
+                Swal.fire({
+                    title: "Laporan berhasil!",
+                    text: `Laporan id #${resAi.data.report.id ?? ''} anda sudah dikirim, anda mendapat reward 50 koin.`,
+                    icon: "success",
+                }).then((res) => {
+                    if (res.isConfirmed) {
+                        location.reload()
+                    }
                 });
-                
-                const responseData = await response.json();
-
-                if (response.ok) {
-                    createPostWhenFinishReport()
-                    Swal.fire({
-                        title: "Laporan berhasil!",
-                        text: `Laporan id #${responseData.data.insertId ?? ''} anda sudah dikirim, anda mendapat reward 50 koin.`,
-                        icon: "success",
-                    }).then((res) => {
-                        if (res.isConfirmed) {
-                            location.reload()
-                        }
-                    });
-                } else {
-                    alert(`Gagal mengirim laporan: ${responseData?.message || response.statusText}`);
-                }
-                } catch (error) {
-                console.error('Error sending report:', error);
-                alert('Terjadi kesalahan saat mengirim laporan.');
-                }
-            } else if (resAi?.res?.includes("TIDAK")) {
+            } else if (resAi?.res?.includes("Bukan")) {
                 setProgress(100)
                 setMessage('Analisa berhasil, gambar tersebut tidak terverifikasi sebagai laporan bencana alam atau kerusakan.')
             }
@@ -169,7 +139,10 @@ export default function ReportForm() {
         }
         
         const formData = new FormData();
+
         formData.append('file', uploadFile1);
+        formData.append('location_lat', clickedLatLng.lat?.toString() ?? '');
+        formData.append('location_long', clickedLatLng.lng?.toString() ?? '');
 
         try {
             const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/lapor/analisis-ai`, {
@@ -179,13 +152,14 @@ export default function ReportForm() {
                 },
                 body: formData
             })
-            console.log(res)
             const data = await res.json()
+            console.log(data)
             if (data) {
                 setProgress(40)
                 setMessage('Mengambil respon..')
                 return {
-                    res: data.data.candidates[0].content.parts[0].text,
+                    data: data.data,
+                    res: data.message,
                     image: data.image
                 }
             }
@@ -216,6 +190,7 @@ export default function ReportForm() {
             })
 
             const data = await res.json()
+            console.log(data)
             if (data) {
                 setProgress(80)
                 setMessage('Membuat postingan dari laporan..')
@@ -229,9 +204,11 @@ export default function ReportForm() {
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
+        setIsSubmit(true)
         
         if (!uploadFile1) {
             alert('Harap unggah foto laporan.');
+            setIsSubmit(false)
             return;
         }
 
@@ -257,12 +234,13 @@ export default function ReportForm() {
         });
         
         const responseData = await response.json();
+        console.log(responseData);
 
         if (response.ok) {
             createPostWhenFinishReport()
             Swal.fire({
                 title: "Laporan berhasil!",
-                text: `Laporan id #${responseData.data.insertId ?? ''} anda sudah dikirim, mohon menunggu untuk verifikasi laporan tersebut.`,
+                text: `Laporan id #${responseData.data.id ?? ''} anda sudah dikirim, mohon menunggu untuk verifikasi laporan tersebut.`,
                 icon: "success",
             }).then((res) => {
                 if (res.isConfirmed) {
@@ -270,9 +248,12 @@ export default function ReportForm() {
                 }
             });
         } else {
+            
+        setIsSubmit(false)
         alert(`Gagal mengirim laporan: ${responseData?.message || response.statusText}`);
         }
         } catch (error) {
+            setIsSubmit(false)
         console.error('Error sending report:', error);
         alert('Terjadi kesalahan saat mengirim laporan.');
         }
@@ -397,7 +378,9 @@ export default function ReportForm() {
                                     type="submit"
                                     className="bg-primary dark:bg-accentDark text-textDark font-bold px-6 py-4 rounded-md hover:bg-blue-900 hover:cursor-pointer transition"
                                     >
-                                    Normal Verifikasi
+                                    {
+                                        isSubmit ? "Loading.." : "Normal Verifikasi"
+                                    }
                                 </button>
                                 <span className='mt-2 text-gray-400'>Biasanya Menunggu 1-2 Hari untuk verifikasi.</span>
                             </div>

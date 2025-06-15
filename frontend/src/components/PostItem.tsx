@@ -155,11 +155,9 @@ export default function PostItem({ post }: { post: PostInterface }) {
     }
   };
 
-  const isoDate = post.created_at;
-  const date = new Date(isoDate);
+  const date = post.created_at;
 
-  const options = { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' };
-  const formattedDate = date.toLocaleDateString('id-ID', options);
+  const formattedDate = date;
   
   let decodedToken: any = ""
   if (token) {

@@ -1,4 +1,5 @@
 import ReportForm from "../components/forms/ReportForm";
+import ListReports from "./ListReports";
 
 export default function ReportPage() {
     return (
@@ -13,6 +14,8 @@ export default function ReportPage() {
             </div>
 
             <ReportForm />
+            <ListReports />
+
         </div>
     );
 }

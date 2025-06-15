@@ -5,8 +5,10 @@ import { PostController } from "../controllers/post.controller.js";
 import { ReportController } from "../controllers/report.controller.js";
 import { BridgeController } from "../controllers/bridge.controller.js";
 import { uploadFile } from "../middleware/Vercelblob.js"; // Pastikan di middleware ada export seperti ini
+
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
+
 export class PostRouter {
   router;
   authMiddleware;
@@ -33,10 +35,11 @@ export class PostRouter {
     this.router.post(
       "/create",
       this.authMiddleware.verifyToken,
-      upload.single("media"), // <- handle file dari frontend (field name: media)
+      upload.single("image"),
       async (req, res) => {
         try {
           if (req.file) {
+            console.log('lolos bang')
             const mediaUrl = await uploadFile(req.file);
             req.body.media_url = mediaUrl;
           }

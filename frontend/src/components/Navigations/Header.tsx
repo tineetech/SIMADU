@@ -19,7 +19,7 @@ export default function Header() {
         { name: "Home", path: "/", icon: <Home size={20} /> },
         { name: "Komunitas", path: "/komunitas", icon: <Users size={20} /> },
         { name: "Lapor", path: "/lapor", icon: <AlertCircle size={20} /> },
-        { name: "Artikel", path: "/artikel", icon: <FileText size={20} /> },
+        // { name: "Artikel", path: "/artikel", icon: <FileText size={20} /> },
     ];
 
     const handleLogout = () => {

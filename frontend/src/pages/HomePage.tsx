@@ -3,12 +3,14 @@ import Features from "../components/HomeSections/Features";
 import About from "../components/HomeSections/About";
 import Contact from "../components/HomeSections/Contact";
 import Features2 from "../components/HomeSections/Features2";
+import Splash from "./Splash";
 
 export default function HomePage() {
 
 	return (
 		<div className=" bg-background text-text dark:bg-backgroundDark dark:text-textDark">
 			<Hero />
+			<Splash />
 			<div className="container mx-auto">
 				<About />
 				<Features />

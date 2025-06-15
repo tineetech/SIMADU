@@ -60,7 +60,7 @@ export default function Hero() {
                                                 <div>
                                                     <p>2024/32/01 - Kang Dedi Mulyadi</p>
                                                 </div>
-                                                <button className="bg-slate-500 rounded-full p-3 cursor-pointer" onClick={() => window.location.href = '/artikel'}>
+                                                <button className="bg-slate-500 rounded-full p-3 cursor-pointer" onClick={() => window.location.href = '/lapor'}>
                                                     <ArrowUpRight size={20} className="text-white" />
                                                 </button>
                                             </div>
