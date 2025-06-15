@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import DarkModeToggle from "./widgets/DarkmodeToggle";
 import NotificationWidget from "./widgets/NotificationWidget";
 import ProfileWidget from "./widgets/ProfileWidget";
-import SidebarMobile from "./navigations/SidebarMobile";
+import SidebarMobile from "./Navigations/SidebarMobile";
 import { Menu } from "lucide-react";
 
 type DashboardHeaderProps = {
