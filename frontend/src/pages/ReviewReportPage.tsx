@@ -17,7 +17,7 @@ import ReportModal from "../components/modals/ReportModal";
 import StatusReportChart from "../components/charts/StatusReportChart";
 import ReportProgressList from "../components/ReportProgressList";
 import OptionFilter from "../components/widgets/OptionFilterProps";
-import GetLaporanData from "../services/GetLaporanData";
+import GetLaporanData from "../services/getLaporanData";
 
 export default function ReviewReportPage() {
     const { data: laporanRaw, loading } = GetLaporanData();
