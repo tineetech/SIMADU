@@ -8,6 +8,24 @@ type ReportCardProps = {
     colSpan: string;
 };
 
+const toTitleCase = (str: string) =>
+    str
+        .toLowerCase()
+        .split(/[\s_]+/)
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" ");
+
+const formatDate = (isoDate: string) => {
+    if (!isoDate) return "Tanggal tidak tersedia";
+    const date = new Date(isoDate);
+    if (isNaN(date.getTime())) return "Tanggal tidak valid";
+
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+    return `${day} - ${month} - ${year}`;
+};
+
 const getStatusBadgeColor = (status: string) => {
     switch (status) {
         case "pending":
@@ -40,7 +58,7 @@ export default function ReportCard({
             <div className="flex flex-col gap-2 mb-4 flex-grow">
                 <div className="flex justify-between items-start">
                     <h1 className="font-medium leading-snug line-clamp-2 max-w-[80%]">
-                        {item.title}
+                        {item.category ? toTitleCase(item.category) : "Laporan Warga"}
                     </h1>
                     <span
                         className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${getStatusBadgeColor(
@@ -56,7 +74,7 @@ export default function ReportCard({
             </div>
             <div className="flex justify-between items-center">
                 <p className="text-xs font-light text-textBody dark:text-textBodyDark">
-                    {item.submittedAt}
+                    {formatDate(item.submittedAt)}
                 </p>
                 <button
                     onClick={() => onViewDetail(item)}

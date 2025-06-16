@@ -69,7 +69,7 @@ export default function ReportList({
                     />
                     <div className="flex flex-col gap-1 w-full">
                         <h2 className="text-lg font-medium truncate">
-                            {toTitleCase(report.category)}
+                            {report.category ? toTitleCase(report.category) : "Lainnya"}
                         </h2>
                         <p className="text-sm text-textBody dark:text-textBodyDark line-clamp-2">
                             {report.description}

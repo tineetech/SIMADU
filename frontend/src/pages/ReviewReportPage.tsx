@@ -83,14 +83,14 @@ export default function ReviewReportPage() {
     const [searchTerm, setSearchTerm] = useState("");
     const [filterCategory, setFilterCategory] = useState("Semua");
     const [filterStatus, setFilterStatus] = useState("Semua");
-    const statusOptions = ["Semua", "Diterima", "Diproses", "Selesai"];
+    const statusOptions = ["Semua", "pending", "proses", "success"];
     const [currentPage, setCurrentPage] = useState(1);
     const reportsPerPage = 5;
 
-    const pendingReports = Reports.filter(report => report.status === "Tertunda");
+    const pendingReports = Reports.filter(report => report.status === "pending");
 
     const filteredReports = Reports
-        .filter(report => report.status !== "Tertunda")
+        .filter(report => report.status !== "pending")
         .filter((report) => {
             const matchSearch = report.title.toLowerCase().includes(searchTerm.toLowerCase());
             const matchCategory = filterCategory === "Semua" || report.category === filterCategory;
@@ -105,7 +105,7 @@ export default function ReviewReportPage() {
     );
 
     const handleViewAllProgress = () => {
-        setFilterStatus("Diproses");
+        setFilterStatus("pending");
         setTimeout(() => {
             reportListRef.current?.scrollIntoView({ behavior: "smooth" });
         }, 100);
@@ -205,7 +205,7 @@ export default function ReviewReportPage() {
                         <h1 className="text-xl font-semibold mb-4">Proses Laporan</h1>
                         <div className="flex flex-col gap-4">
                             {Reports
-                                .filter((report) => report.status === "Diproses")
+                                .filter((report) => report.status === "proses")
                                 .slice(0, 3)
                                 .map((report, idx) => {
                                     const icon = categoryIcons[report.category] || <AlertCircle className="text-gray-400" />;
@@ -219,7 +219,7 @@ export default function ReviewReportPage() {
                                         />
                                     );
                                 })}
-                            {Reports.filter((r) => r.status === "Diproses").length > 3 && (
+                            {Reports.filter((r) => r.status === "proses").length > 3 && (
                                 <div className="flex justify-end">
                                     <p
                                         className="text-sm font-light cursor-pointer hover:underline"
