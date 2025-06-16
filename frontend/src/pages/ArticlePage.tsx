@@ -42,14 +42,14 @@ export default function ArticlePage() {
       <section className="bg-background dark:bg-backgroundDark text-text dark:text-textDark">
         <div className="container mx-auto py-35 px-4 md:px-20">
           <div className="flex flex-col gap-5 mt-5 ">
-              <div className="bg-gray-100  dark:bg-tertiaryDark w-full overflow-hidden rounded-xl">
-                  <div className="loading-box w-full h-full py-20 bg-tertiaryDark dark:bg-white">
-                  </div>
+            <div className="bg-gray-100  dark:bg-tertiaryDark w-full overflow-hidden rounded-xl">
+              <div className="loading-box w-full h-full py-20 bg-tertiaryDark dark:bg-white">
               </div>
-              <div className="bg-gray-100  dark:bg-tertiaryDark w-full overflow-hidden rounded-xl">
-                  <div className="loading-box w-full h-full py-20 bg-tertiaryDark dark:bg-white">
-                  </div>
+            </div>
+            <div className="bg-gray-100  dark:bg-tertiaryDark w-full overflow-hidden rounded-xl">
+              <div className="loading-box w-full h-full py-20 bg-tertiaryDark dark:bg-white">
               </div>
+            </div>
           </div>
         </div>
       </section>
@@ -105,11 +105,11 @@ export default function ArticlePage() {
             </>
           )}
 
-         <div className="relative bg-[url('/images/pemlik.avif')] rounded-xl   p-4 flex items-center justify-center text-center md:[grid-area:g]">
+          <div className="relative bg-[url('/images/pemlik.avif')] rounded-xl   p-4 flex items-center justify-center text-center md:[grid-area:g]">
             <p className="absolute bottom-4 left-4 font-bold drop-shadow-md text-left">
               🌱 Edukasi berkelanjutan
             </p>
-        </div>
+          </div>
 
           <div
             className="bg-tertiary dark:bg-tertiaryDark rounded-xl p-4 flex items-center justify-center text-center md:[grid-area:f]"
@@ -124,7 +124,7 @@ export default function ArticlePage() {
           </div>
         </div>
 
-        <div className="mb-8">
+        <div className="flex items-center mb-8">
           <h2 className="text-3xl font-semibold mb-4">
             Mulai perjalanan literasimu hari ini!
           </h2>

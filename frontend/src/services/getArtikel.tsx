@@ -28,11 +28,9 @@ export interface PopularArticlesResponse {
   source: string;
 }
 
-const API_BASE_URL = import.meta.env.VITE_ARTIKEL_SERVICE;
-
 export const fetchArticles = async (): Promise<ArticleInterface1[]> => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/api/berita/scrape`);
+    const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/berita/scrape`);
     return response.data;
   } catch (error) {
     console.error('Error fetching articles:', error);
@@ -42,7 +40,7 @@ export const fetchArticles = async (): Promise<ArticleInterface1[]> => {
 
 export const fetchPopularArticles = async (): Promise<PopularArticlesResponse> => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/api/berita/scrape/populer`);
+    const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/berita/scrape/populer`);
     
     // Format the date to match your example (e.g., "13 May 2025")
     const formattedDate = new Date().toLocaleDateString('en-GB', {
@@ -63,5 +61,3 @@ export const fetchPopularArticles = async (): Promise<PopularArticlesResponse> =
     throw error;
   }
 };
-
-// Alternative implementation if you need to scrape directly from Kompas
