@@ -9,6 +9,7 @@ interface PostDetailModalProps {
 }
 
 export default function PostDetailModal({ post, onClose, onVerify }: PostDetailModalProps) {
+
     return (
         <AnimatePresence>
             {post && (

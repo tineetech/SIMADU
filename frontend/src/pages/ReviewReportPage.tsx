@@ -25,6 +25,8 @@ export default function ReviewReportPage() {
     const laporanArray = Array.isArray(laporanRaw?.data) ? laporanRaw.data : [];
 
     const Reports: Report[] = laporanArray.map((lapor: any) => ({
+        id: lapor.id, // ⬅️ Tambahkan ini
+        user_id: lapor.user_id, // ⬅️ dan ini
         title: lapor.title || "Tanpa Judul",
         description: lapor.description || lapor.notes || "Tidak ada deskripsi",
         submittedAt: lapor.event_date || "2025-01-01",
@@ -32,6 +34,7 @@ export default function ReviewReportPage() {
         status: lapor.status || "Pending",
         category: lapor.category || "Lainnya",
     }));
+
 
     // Fungsi bantu untuk dapatkan nama bulan dari ISO string
     const getMonthName = (dateStr: string) => {

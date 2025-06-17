@@ -9,13 +9,11 @@ interface ReportModalProps {
 
 const getStatusBadgeColor = (status: string) => {
     switch (status) {
-        case "Tertunda":
+        case "pending":
             return "bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-200";
-        case "Diterima":
+        case "proses":
             return "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-200";
-        case "Diproses":
-            return "bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-200";
-        case "Selesai":
+        case "success":
             return "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-200";
         default:
             return "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300";
@@ -23,9 +21,19 @@ const getStatusBadgeColor = (status: string) => {
 };
 
 export default function ReportModal({ report, onClose }: ReportModalProps) {
+    if (!report) return null;
+
+    console.log(report)
+
     const isDark = document.documentElement.classList.contains("dark");
     const updateStatus = async (id: number) => {
+        if (!id || isNaN(id)) {
+            console.warn("ID tidak valid saat updateStatus:", id);
+            return { error: true };
+        }
+
         try {
+            console.log(id)
             const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/lapor/update-status/${id}`, {
                 method: "POST",
                 headers: {
@@ -33,7 +41,7 @@ export default function ReportModal({ report, onClose }: ReportModalProps) {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    status: 'success',
+                    status: 'proses',
                 })
             });
 
@@ -125,6 +133,12 @@ export default function ReportModal({ report, onClose }: ReportModalProps) {
     };
 
     const handleVerification = async (id: number, user_id: number) => {
+
+        if (!id) {
+            console.warn("ID atau user_id tidak valid:", { id });
+            return;
+        }
+
         const isDark = document.documentElement.classList.contains("dark");
 
         const result = await Swal.fire({
@@ -169,7 +183,7 @@ export default function ReportModal({ report, onClose }: ReportModalProps) {
         }
     };
 
-    const statusOptions = ["Diterima", "Diproses", "Selesai"];
+    const statusOptions = ["pending", "proses", "success"];
 
     const handleManualStatusUpdate = async (newStatus: string) => {
         if (!report) return;
@@ -214,6 +228,28 @@ export default function ReportModal({ report, onClose }: ReportModalProps) {
         onClose();
     };
 
+    if (!report?.id) {
+        return (
+            <AnimatePresence>
+                <motion.div
+                    className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center px-4"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                >
+                    <motion.div
+                        className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-xl flex flex-col items-center gap-4"
+                        initial={{ y: 50, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        exit={{ y: 50, opacity: 0 }}
+                    >
+                        <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                        <p className="text-sm text-gray-700 dark:text-gray-100">Memuat data laporan...</p>
+                    </motion.div>
+                </motion.div>
+            </AnimatePresence>
+        );
+    }
 
     return (
         <AnimatePresence>
@@ -235,7 +271,7 @@ export default function ReportModal({ report, onClose }: ReportModalProps) {
                     >
                         <div className="flex flex-col gap-4">
                             <img
-                                src={import.meta.env.VITE_BACKEND_URL + report.image}
+                                src={report.image}
                                 alt={report.title}
                                 className="rounded-lg w-full max-h-56 object-cover"
                             />
@@ -263,13 +299,22 @@ export default function ReportModal({ report, onClose }: ReportModalProps) {
                                     Tutup
                                 </button>
 
-                                {report.status === "Tertunda" ? (
-                                    <button
-                                        onClick={() => handleVerification(report.id, report.user_id)}
-                                        className="px-4 py-2 rounded-md text-sm font-medium bg-primary hover:bg-primary/70 text-white transition"
-                                    >
-                                        Verifikasi
-                                    </button>
+                                {report.status === "pending" ? (
+                                    report.id && report.user_id ? (
+                                        <button
+                                            onClick={() => handleVerification(report.id, report.user_id)}
+                                            className="px-4 py-2 rounded-md text-sm font-medium bg-primary hover:bg-primary/70 text-white transition"
+                                        >
+                                            Verifikasi
+                                        </button>
+                                    ) : (
+                                        <button
+                                            disabled
+                                            className="px-4 py-2 rounded-md text-sm font-medium bg-gray-300 text-gray-500 cursor-not-allowed"
+                                        >
+                                            Memuat...
+                                        </button>
+                                    )
                                 ) : (
                                     <div className="flex items-center gap-2">
                                         <select
